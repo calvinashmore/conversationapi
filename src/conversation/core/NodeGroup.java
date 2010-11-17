@@ -5,6 +5,8 @@
 
 package conversation.core;
 
+import java.util.List;
+
 /**
  *
  * @author Calvin Ashmore
@@ -15,5 +17,7 @@ public class NodeGroup {
         optional, sequential
     }
 
+    private Type type;
+    private List<DialogueNode> nodes;
 
 }

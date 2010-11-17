@@ -13,19 +13,8 @@ import java.util.List;
  */
 public class Conversation {
 
-    private List<DialogueNode> allNodes;
-    private List<DialogueBeat> allBeats;
-    private List<Topic> allTopics;
+    private List<DialogueNode> allNodes = new ArrayList<DialogueNode>();
+    private List<DialogueBeat> allBeats = new ArrayList<DialogueBeat>();
+    private List<Topic> allTopics = new ArrayList<Topic>();
 
-    private List<DialogueNode> getPossibleNodes(DialogueAgent agent, ConversationState state) {
-
-        // simple technique-
-        List<DialogueNode> nodes = new ArrayList<DialogueNode>();
-        for (DialogueNode dialogueNode : allNodes) {
-            if (dialogueNode.getAgent() == agent && dialogueNode.enabled(state)) {
-                nodes.add(dialogueNode);
-            }
-        }
-        return nodes;
-    }
 }
