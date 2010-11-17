@@ -14,6 +14,8 @@ public class DialogueBeat {
     //private DialogueNode initiatingNode;
     // initiating nodes are handled through NodeGroups.
 
+    private Condition condition;
+
     private Topic topic; // the topic to which this beat belongs
 
     private String description; // optional?

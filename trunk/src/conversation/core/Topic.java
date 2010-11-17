@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package conversation.core;
 
 /**
@@ -11,11 +10,9 @@ package conversation.core;
  */
 public class Topic {
 
+    private Condition condition;
     private String description; // optional?
-
     private boolean starting; // whether this topic can start a conversation.
-
     // list of nodes which can initiate this topic?
-
     // CONDITION that enables the topic?
 }
