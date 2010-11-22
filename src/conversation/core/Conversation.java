@@ -18,4 +18,19 @@ public class Conversation {
     private List<Topic> allTopics = new ArrayList<Topic>();
     private ConversationState initialState = new ConversationState();
 
+    public List<DialogueBeat> getAllBeats() {
+        return allBeats;
+    }
+
+    public List<DialogueNode> getAllNodes() {
+        return allNodes;
+    }
+
+    public List<Topic> getAllTopics() {
+        return allTopics;
+    }
+
+    public ConversationState getInitialState() {
+        return initialState;
+    }
 }

@@ -4,6 +4,10 @@
  */
 package conversation.core;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /**
  *
  * @author Calvin Ashmore
@@ -13,11 +17,13 @@ public class Topic {
     final private Condition condition;
     final private String description; // optional?
     final private boolean starting; // whether this topic can start a conversation.
+    final private List<DialogueBeat> beats;
 
     protected Topic(Builder builder) {
         this.condition = builder.condition;
         this.description = builder.description;
         this.starting = builder.starting;
+        this.beats = Collections.unmodifiableList(new ArrayList<DialogueBeat>(builder.beats));
     }
 
     public Condition getCondition() {
@@ -31,14 +37,17 @@ public class Topic {
     public boolean isStarting() {
         return starting;
     }
-    // list of nodes which can initiate this topic?
-    // CONDITION that enables the topic?
+
+    public List<DialogueBeat> getBeats() {
+        return beats;
+    }
 
     public static class Builder {
 
         public Condition condition;
         public String description; // optional?
         public boolean starting; // whether this topic can start a conversation.
+        public List<DialogueBeat> beats = new ArrayList<DialogueBeat>();
 
         public Topic build() {
             return new Topic(this);
