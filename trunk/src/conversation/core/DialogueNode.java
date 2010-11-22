@@ -5,6 +5,7 @@
 package conversation.core;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -17,16 +18,14 @@ public class DialogueNode {
     private static final DialogueNode topicBreak;
 
     static {
-        
     }
-
-    private String description; // optional?
-    private DialogueBeat beat; // the beat to which this node belongs
-    private DialogueAgent agent; // the agent who speaks this node. This IS a part of the authoring, not the runtime.
-    private Condition condition;
-    private boolean starting; // whether this node can start a beat.
+    final private String description; // optional?
+    final private DialogueBeat beat; // the beat to which this node belongs
+    final private DialogueAgent agent; // the agent who speaks this node. This IS a part of the authoring, not the runtime.
+    final private Condition condition;
+    final private boolean starting; // whether this node can start a beat.
 //    private NodeGroup group; // the group to which this node belongs.
-    private List<Effect> effects;
+    final private List<Effect> effects;
 
     protected DialogueNode(Builder builder) {
         this.description = builder.description;
@@ -34,7 +33,7 @@ public class DialogueNode {
         this.agent = builder.agent;
         this.condition = builder.condition;
         this.starting = builder.starting;
-        this.effects = new ArrayList<Effect>(builder.effects);
+        this.effects = Collections.unmodifiableList(new ArrayList<Effect>(builder.effects));
     }
 
     public Condition getCondition() {

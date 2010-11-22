@@ -14,4 +14,5 @@ package conversation.core;
  */
 abstract public class Effect {
 
+    abstract public void apply(ConversationState state);
 }
