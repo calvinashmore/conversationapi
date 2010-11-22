@@ -14,11 +14,22 @@ import java.util.List;
  */
 public class DialogueNode {
 
-    private static final DialogueNode beatBreak;
-    private static final DialogueNode topicBreak;
+    // these are special case nodes,
+    // basically a signal to break the node group and allow other beats or topics to enter.
+    // note: this is not serialization safe.
+    public static final DialogueNode beatBreak;
+    public static final DialogueNode topicBreak;
 
     static {
+        Builder builder = new Builder();
+        builder.description = "Beat Break";
+        beatBreak = builder.build();
+
+        builder.description = "Topic Break";
+        topicBreak = builder.build();
     }
+
+
     final private String description; // optional?
     final private DialogueBeat beat; // the beat to which this node belongs
     final private DialogueAgent agent; // the agent who speaks this node. This IS a part of the authoring, not the runtime.
@@ -66,7 +77,7 @@ public class DialogueNode {
         return effects;
     }
 
-    public class Builder {
+    public static class Builder {
 
         private String description; // optional?
         private DialogueBeat beat; // the beat to which this node belongs

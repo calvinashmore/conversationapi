@@ -16,5 +16,6 @@ public class Conversation {
     private List<DialogueNode> allNodes = new ArrayList<DialogueNode>();
     private List<DialogueBeat> allBeats = new ArrayList<DialogueBeat>();
     private List<Topic> allTopics = new ArrayList<Topic>();
+    private ConversationState initialState = new ConversationState();
 
 }

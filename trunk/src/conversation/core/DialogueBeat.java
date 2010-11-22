@@ -46,7 +46,7 @@ public class DialogueBeat {
         return topic;
     }
 
-    public class Builder {
+    public static class Builder {
 
         public Condition condition;
         public Topic topic;

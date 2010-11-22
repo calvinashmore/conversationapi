@@ -113,7 +113,7 @@ starting topic {
             op {
                 node {brian, "*sip* mmm, delicious", cheerful++}
                 node {brian, "you know me so well!", congenial++}
-                op {sorry, beat break, topic break}
+                op {beat break, topic break}
             }
         }
 
