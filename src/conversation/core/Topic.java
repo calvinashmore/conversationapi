@@ -10,9 +10,9 @@ package conversation.core;
  */
 public class Topic {
 
-    private Condition condition;
-    private String description; // optional?
-    private boolean starting; // whether this topic can start a conversation.
+    final private Condition condition;
+    final private String description; // optional?
+    final private boolean starting; // whether this topic can start a conversation.
 
     protected Topic(Builder builder) {
         this.condition = builder.condition;

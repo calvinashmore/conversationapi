@@ -5,6 +5,7 @@
 
 package conversation.basic;
 
+import conversation.core.ConversationState;
 import conversation.core.DialogueNode;
 
 /**
@@ -14,4 +15,5 @@ import conversation.core.DialogueNode;
 public class BasicNode extends DialogueNode {
 
     private String content;
+
 }
