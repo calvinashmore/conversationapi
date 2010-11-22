@@ -7,9 +7,13 @@ package conversation.runtime;
 import conversation.core.Conversation;
 import conversation.core.ConversationState;
 import conversation.core.DialogueAgent;
+import conversation.core.DialogueBeat;
 import conversation.core.DialogueNode;
 import conversation.core.NodeGroup;
+import conversation.core.Topic;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -24,10 +28,10 @@ public class Runtime {
     private RuntimeNode lastNode;
     private NodeGroup currentGroup;
     // the variables present in the conversation.
-    private ConversationState state;
-    private List<RuntimeTopic> pastTopics;
+    private ConversationState currentState;
+    private Map<Topic, RuntimeTopic> topics = new HashMap<Topic, RuntimeTopic>();
+    private Map<DialogueBeat, RuntimeBeat> beats = new HashMap<DialogueBeat, RuntimeBeat>();
+    private Map<DialogueNode, RuntimeNode> nodes = new HashMap<DialogueNode, RuntimeNode>();
 
-    private List<DialogueNode> getPossibleNodes(DialogueAgent agent) {
-        // returns the possible nodes that the agent can speak at this point
-    }
+    
 }

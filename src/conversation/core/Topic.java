@@ -34,7 +34,7 @@ public class Topic {
     // list of nodes which can initiate this topic?
     // CONDITION that enables the topic?
 
-    public class Builder {
+    public static class Builder {
 
         public Condition condition;
         public String description; // optional?
