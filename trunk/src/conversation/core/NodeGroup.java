@@ -20,4 +20,5 @@ public class NodeGroup {
     private Type type;
     private List<DialogueNode> nodes;
 
+
 }
