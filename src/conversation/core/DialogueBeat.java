@@ -48,7 +48,7 @@ public class DialogueBeat {
 
     public static class Builder {
 
-        public Condition condition;
+        public Condition condition = Condition.TRUE_CONDITION;
         public Topic topic;
         public String description;
         public boolean starting;
