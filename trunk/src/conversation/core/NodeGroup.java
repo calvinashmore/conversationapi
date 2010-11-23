@@ -12,11 +12,11 @@ import java.util.List;
  *
  * @author Calvin Ashmore
  */
-public class NodeGroup {
+public class NodeGroup extends Node {
 
     protected NodeGroup(Builder builder) {
         this.type = builder.type;
-        this.nodes = Collections.unmodifiableList(new ArrayList<DialogueNode>(builder.nodes));
+        this.nodes = Collections.unmodifiableList(new ArrayList<Node>(builder.nodes));
         this.starting = builder.starting;
     }
 
@@ -25,10 +25,10 @@ public class NodeGroup {
         optional, sequential
     }
     private Type type;
-    private List<DialogueNode> nodes;
+    private List<Node> nodes;
     private boolean starting;
 
-    public List<DialogueNode> getNodes() {
+    public List<Node> getNodes() {
         return nodes;
     }
 
@@ -43,7 +43,7 @@ public class NodeGroup {
     public static class Builder {
 
         public Type type;
-        public List<DialogueNode> nodes = new ArrayList<DialogueNode>();
+        public List<Node> nodes = new ArrayList<Node>();
         public boolean starting;
 
         public NodeGroup build() {
