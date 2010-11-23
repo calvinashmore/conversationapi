@@ -44,7 +44,7 @@ public class Topic {
 
     public static class Builder {
 
-        public Condition condition;
+        public Condition condition = Condition.TRUE_CONDITION;
         public String description; // optional?
         public boolean starting; // whether this topic can start a conversation.
         public List<DialogueBeat> beats = new ArrayList<DialogueBeat>();
