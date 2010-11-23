@@ -11,5 +11,23 @@ package conversation.core;
  */
 abstract public class Condition {
 
+    public final static Condition TRUE_CONDITION = new ConstantCondition(true);
+    public final static Condition FALSE_CONDITION = new ConstantCondition(false);
+
     abstract public boolean evaluate(ConversationState state);
+
+    private static class   ConstantCondition extends Condition{
+
+        private final boolean value;
+
+        public ConstantCondition(boolean value) {
+            this.value = value;
+        }
+
+
+        @Override
+        public boolean evaluate(ConversationState state) {
+            return value;
+        }
+    }
 }

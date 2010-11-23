@@ -12,22 +12,8 @@ import java.util.List;
  *
  * @author Calvin Ashmore
  */
-public class DialogueNode {
+public class DialogueNode extends Node {
 
-    // these are special case nodes,
-    // basically a signal to break the node group and allow other beats or topics to enter.
-    // note: this is not serialization safe.
-    public static final DialogueNode beatBreak;
-    public static final DialogueNode topicBreak;
-
-    static {
-        Builder builder = new Builder();
-        builder.description = "Beat Break";
-        beatBreak = builder.build();
-
-        builder.description = "Topic Break";
-        topicBreak = builder.build();
-    }
 
 
     final private String description; // optional?
@@ -45,10 +31,6 @@ public class DialogueNode {
         this.condition = builder.condition;
         this.starting = builder.starting;
         this.effects = Collections.unmodifiableList(new ArrayList<Effect>(builder.effects));
-    }
-
-    public Condition getCondition() {
-        return condition;
     }
 
     //private List<DialogueNode> potentialResponses; // the responses which will continue this beat.
