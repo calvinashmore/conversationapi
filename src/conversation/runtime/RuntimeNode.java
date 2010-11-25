@@ -13,5 +13,13 @@ import conversation.core.DialogueNode;
  */
 public class RuntimeNode {
 
-    DialogueNode node;
+    private DialogueNode node;
+
+    RuntimeNode(DialogueNode node) {
+        this.node = node;
+    }
+
+    public DialogueNode getNode() {
+        return node;
+    }
 }

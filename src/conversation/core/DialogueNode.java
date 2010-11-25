@@ -18,7 +18,7 @@ public class DialogueNode extends Node {
     final private DialogueBeat beat; // the beat to which this node belongs
     final private DialogueAgent agent; // the agent who speaks this node. This IS a part of the authoring, not the runtime.
     final private Condition condition;
-    final private boolean starting; // whether this node can start a beat.
+//    final private boolean starting; // whether this node can start a beat.
 //    private NodeGroup group; // the group to which this node belongs.
     final private List<Effect> effects;
 
@@ -27,7 +27,7 @@ public class DialogueNode extends Node {
         this.beat = builder.beat;
         this.agent = builder.agent;
         this.condition = builder.condition;
-        this.starting = builder.starting;
+//        this.starting = builder.starting;
         this.effects = Collections.unmodifiableList(new ArrayList<Effect>(builder.effects));
     }
 
@@ -49,9 +49,9 @@ public class DialogueNode extends Node {
         return description;
     }
 
-    public boolean isStarting() {
-        return starting;
-    }
+//    public boolean isStarting() {
+//        return starting;
+//    }
 
     public List<Effect> getEffects() {
         return effects;
@@ -67,7 +67,7 @@ public class DialogueNode extends Node {
         private DialogueBeat beat; // the beat to which this node belongs
         private DialogueAgent agent; // the agent who speaks this node. This IS a part of the authoring, not the runtime.
         private Condition condition = Condition.TRUE_CONDITION;
-        public boolean starting; // whether this node can start a beat.
+//        public boolean starting; // whether this node can start a beat.
         //    private NodeGroup group; // the group to which this node belongs.
         public List<Effect> effects = new ArrayList<Effect>();
 
