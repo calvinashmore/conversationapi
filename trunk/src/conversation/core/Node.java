@@ -15,12 +15,15 @@ abstract public class Node {
     // note: this is not serialization safe.
     public static final Node BEAT_BREAK;
     public static final Node TOPIC_BREAK;
+    public static final Node CONVERSATION_END;
 
     static {
 
         BEAT_BREAK = new Node() {
         };
         TOPIC_BREAK = new Node() {
+        };
+        CONVERSATION_END = new Node() {
         };
     }
 }

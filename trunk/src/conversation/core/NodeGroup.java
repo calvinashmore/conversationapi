@@ -18,6 +18,7 @@ public class NodeGroup extends Node {
         this.type = builder.type;
         this.nodes = Collections.unmodifiableList(new ArrayList<Node>(builder.nodes));
         this.starting = builder.starting;
+        this.parent = builder.parent;
     }
 
     public static enum Type {
@@ -27,6 +28,11 @@ public class NodeGroup extends Node {
     private Type type;
     private List<Node> nodes;
     private boolean starting;
+    private NodeGroup parent;
+
+    public NodeGroup getParent() {
+        return parent;
+    }
 
     public List<Node> getNodes() {
         return nodes;
@@ -45,6 +51,7 @@ public class NodeGroup extends Node {
         public Type type;
         public List<Node> nodes = new ArrayList<Node>();
         public boolean starting;
+        public NodeGroup parent;
 
         public NodeGroup build() {
             return new NodeGroup(this);
