@@ -12,6 +12,7 @@ import conversation.core.Node;
 import conversation.core.NodeGroup;
 import conversation.core.Topic;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,17 +43,8 @@ public class Runtime {
 
     public void startConversation() {
         this.currentState = conversation.getInitialState().clone();
-        List<Topic> topics = getEnabledTopics(true);
-        List<DialogueBeat> beats = new ArrayList<DialogueBeat>();
-        for (Topic topic : topics) {
-            beats.addAll(getEnabledBeats(topic, true));
-        }
 
-        // get the node/group pairs
-        List<Pair<NodeGroup, DialogueNode>> nodesAndGroups = new ArrayList<Pair<NodeGroup, DialogueNode>>();
-        for (DialogueBeat beat : beats) {
-            nodesAndGroups.addAll(getNodeChoices(beat));
-        }
+        List<Pair<NodeGroup, DialogueNode>> nodesAndGroups = getChoicesInConversation(true);
 
         List<DialogueNode> nodes = new ArrayList<DialogueNode>();
         for (Pair<NodeGroup, DialogueNode> pair : nodesAndGroups) {
@@ -77,10 +69,116 @@ public class Runtime {
      * @return
      */
     private List<Pair<NodeGroup, DialogueNode>> getCurrentNodeChoices() {
-        List<Pair<NodeGroup, DialogueNode>> choices = new ArrayList<Pair<NodeGroup, DialogueNode>>();
+
+        // we may be able to return quickly. 
+        // if we were on a sequential node group, attempt to go to the next
+        Node next;
+        if (currentGroup.getType() == NodeGroup.Type.sequential) {
+            // get the placement of the last node.
+            int lastIndex = currentGroup.getNodes().indexOf(lastNode);
+
+            if (currentGroup.getNodes().size() >= lastIndex - 1) {
+                // need to go up a level
+                next = getNodeAfterGroupEnd(currentGroup);
+            } else {
+                // need to choose the next one
+                next = currentGroup.getNodes().get(lastIndex + 1);
+            }
+        } else {
+            // need to go up a level
+            next = getNodeAfterGroupEnd(currentGroup);
+        }
+
+        // does this make sense????
+//        if (next == null) {
+//            List<Pair<NodeGroup, DialogueNode>> choices = getChoicesInTopic(currentTopic.getTopic(), false);
+//            if (choices.isEmpty()) {
+//                return getChoicesInConversation(false);
+//            }
+//        }
+
+        // we have a node, there are several things it can be:
+        // either a dialouge node, a group, or a break.
+        return getChoicesFromNode(next);
 
         // look in the current group, manipulate.
         // if we are in a block which provides a topic or beat break, search those too.
+    }
+
+    /**
+     * Here we are looking for the next node after the given group has ended.
+     * @param ng
+     * @return
+     */
+    private Node getNodeAfterGroupEnd(NodeGroup ng) {
+        NodeGroup parent = ng.getParent();
+        if (parent == null) {
+            return null;
+        }
+        int lastIndex = parent.getNodes().indexOf(ng);
+        if (lastIndex >= parent.getNodes().size() - 1) {
+            // if this condition holds, we are at the end of the group.
+            return getNodeAfterGroupEnd(parent);
+        }
+        return parent.getNodes().get(lastIndex + 1);
+    }
+
+    private List<Pair<NodeGroup, DialogueNode>> getChoicesFromNode(Node node) {
+        if (node instanceof DialogueNode) {
+            // this is the simple case.
+            Pair<NodeGroup, DialogueNode> pair = new Pair<NodeGroup, DialogueNode>(currentGroup, (DialogueNode) node);
+            return Collections.singletonList(pair);
+        } else if (node instanceof NodeGroup) {
+            // entering a NEW NodeGroup, so start from the top.
+            NodeGroup ng = (NodeGroup) node;
+            if (ng.getType() == NodeGroup.Type.optional) {
+                // return all options if we hit an optional node group.
+                List<Pair<NodeGroup, DialogueNode>> r = new ArrayList<Pair<NodeGroup, DialogueNode>>();
+                for (Node option : ng.getNodes()) {
+                    r.addAll(getChoicesFromNode(option));
+                }
+                return r;
+            } else if (ng.getType() == NodeGroup.Type.sequential) {
+                // return only the search results from the first element if we hit a sequential group.
+                return getChoicesFromNode(ng.getNodes().get(0));
+            } else {
+                // should not get here
+                return null;
+            }
+
+        } else if (node == Node.BEAT_BREAK) {
+            // this is a beat break ONLY. We have to select a new beat within the topic.
+            return getChoicesInTopic(currentTopic.getTopic(), false);
+        } else if (node == Node.TOPIC_BREAK) {
+            // this is a topic break ONLY. We have to select a new topic in the conversation.
+            return getChoicesInConversation(false);
+        } else if (node == Node.CONVERSATION_END) {
+            return Collections.EMPTY_LIST;
+        }
+        // should not get here.
+        return null;
+    }
+
+    private List<Pair<NodeGroup, DialogueNode>> getChoicesInTopic(Topic topic, boolean startingOnly) {
+        List<DialogueBeat> enabledBeats = getEnabledBeats(topic, startingOnly);
+        List<Pair<NodeGroup, DialogueNode>> choices = new ArrayList<Pair<NodeGroup, DialogueNode>>();
+        for (DialogueBeat dialogueBeat : enabledBeats) {
+            choices.addAll(getChoicesInBeat(dialogueBeat));
+        }
+        return choices;
+    }
+
+    private List<Pair<NodeGroup, DialogueNode>> getChoicesInConversation(boolean startingOnly) {
+        List<Topic> enabledTopics = getEnabledTopics(startingOnly);
+        List<DialogueBeat> enabledBeats = new ArrayList<DialogueBeat>();
+        for (Topic topic : enabledTopics) {
+            enabledBeats.addAll(getEnabledBeats(topic, true)); // true for starting new topics
+        }
+        List<Pair<NodeGroup, DialogueNode>> choices = new ArrayList<Pair<NodeGroup, DialogueNode>>();
+        for (DialogueBeat dialogueBeat : enabledBeats) {
+            choices.addAll(getChoicesInBeat(dialogueBeat));
+        }
+        return choices;
     }
 
     protected void deploy(NodeGroup group, DialogueNode node) {
@@ -147,6 +245,11 @@ public class Runtime {
                 continue;
             }
 
+            // do not allow previously selected topics
+            if (deployedTopics.get(topic) != null) {
+                continue;
+            }
+
             if (topic.getCondition().evaluate(currentState)) {
                 topics.add(topic);
             }
@@ -158,10 +261,21 @@ public class Runtime {
         return topics;
     }
 
+    /**
+     * Returns beats that are allowed in the given topic. 
+     * @param topic
+     * @param startingOnly
+     * @return
+     */
     protected List<DialogueBeat> getEnabledBeats(Topic topic, boolean startingOnly) {
         List<DialogueBeat> beats = new ArrayList<DialogueBeat>();
         for (DialogueBeat beat : topic.getBeats()) {
             if (startingOnly && !beat.isStarting()) {
+                continue;
+            }
+
+            // do not allow previously selected beats
+            if (deployedBeats.get(beat) != null) {
                 continue;
             }
 
@@ -182,38 +296,7 @@ public class Runtime {
      * @param beat
      * @return
      */
-    private List<Pair<NodeGroup, DialogueNode>> getNodeChoices(DialogueBeat beat) {
-        return getNodeChoices(beat.getRoot(), new ArrayList<Pair<NodeGroup, DialogueNode>>());
-    }
-
-    private List<Pair<NodeGroup, DialogueNode>> getNodeChoices(NodeGroup ng, List<Pair<NodeGroup, DialogueNode>> current) {
-
-        // this collects the possible choices if we are starting a beat.
-
-        if (ng.getType() == NodeGroup.Type.optional) {
-            // with optional node groups, we add everything
-            for (Node option : ng.getNodes()) {
-                if (option instanceof DialogueNode) {
-                    current.add(new Pair<NodeGroup, DialogueNode>(ng, (DialogueNode) option));
-                } else if (option instanceof NodeGroup) {
-                    getNodeChoices((NodeGroup) option, current);
-                }
-            }
-        } else if (ng.getType() == NodeGroup.Type.sequential) {
-
-            // with sequential node groups, we add only the first entry.
-            if (!ng.getNodes().isEmpty()) {
-                Node option = ng.getNodes().get(0);
-
-                if (option instanceof DialogueNode) {
-                    current.add(new Pair<NodeGroup, DialogueNode>(ng, (DialogueNode) option));
-                } else if (option instanceof NodeGroup) {
-                    getNodeChoices((NodeGroup) option, current);
-                }
-            } else {
-                // should not get here. Handle?
-            }
-        }
-        return current;
+    private List<Pair<NodeGroup, DialogueNode>> getChoicesInBeat(DialogueBeat beat) {
+        return getChoicesFromNode(beat.getRoot());
     }
 }
