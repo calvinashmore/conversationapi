@@ -17,7 +17,7 @@ public class NodeGroup extends Node {
     protected NodeGroup(Builder builder) {
         this.type = builder.type;
         this.nodes = Collections.unmodifiableList(new ArrayList<Node>(builder.nodes));
-        this.starting = builder.starting;
+//        this.starting = builder.starting;
         this.parent = builder.parent;
     }
 
@@ -27,7 +27,7 @@ public class NodeGroup extends Node {
     }
     private Type type;
     private List<Node> nodes;
-    private boolean starting;
+//    private boolean starting;
     private NodeGroup parent;
 
     public NodeGroup getParent() {
@@ -42,15 +42,15 @@ public class NodeGroup extends Node {
         return type;
     }
 
-    public boolean isStarting() {
-        return starting;
-    }
+//    public boolean isStarting() {
+//        return starting;
+//    }
 
     public static class Builder {
 
         public Type type;
         public List<Node> nodes = new ArrayList<Node>();
-        public boolean starting;
+//        public boolean starting;
         public NodeGroup parent;
 
         public NodeGroup build() {

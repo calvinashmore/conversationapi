@@ -23,7 +23,8 @@ public class Topic {
         this.condition = builder.condition;
         this.description = builder.description;
         this.starting = builder.starting;
-        this.beats = Collections.unmodifiableList(new ArrayList<DialogueBeat>(builder.beats));
+        this.beats = new ArrayList<DialogueBeat>(builder.beats);
+        //Collections.unmodifiableList(new ArrayList<DialogueBeat>(builder.beats));
     }
 
     public Condition getCondition() {
@@ -46,7 +47,7 @@ public class Topic {
 
         public Condition condition = Condition.TRUE_CONDITION;
         public String description; // optional?
-        public boolean starting; // whether this topic can start a conversation.
+        public boolean starting = false; // whether this topic can start a conversation.
         public List<DialogueBeat> beats = new ArrayList<DialogueBeat>();
 
         public Topic build() {
