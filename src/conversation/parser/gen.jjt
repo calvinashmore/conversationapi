@@ -134,6 +134,22 @@ TOKEN :
   >
 }
 
+/* KEYWORDS */
+
+TOKEN :
+{
+    < CONVERSATION: "conversation" >
+|   < PARTICIPANT: "participant" >
+|   < STARTING: "starting" >
+|   < TOPIC: "topic" >
+|   < BEAT: "beat" >
+|   < NODE: "node" >
+|   < OP: "op" >
+|   < SEQ: "seq" >
+|   < BREAK: "break" >
+}
+
+
 /* IDENTIFIERS */
 
 TOKEN :
@@ -263,10 +279,24 @@ TOKEN :
 
 
 ASTConversationTopLevel ConversationTopLevel() #ConversationTopLevel : {
-	Token t;
+    Token t;
 } {
-    "conversation" (t = <IDENTIFIER>) {System.out.println("conversation: "+t.image);}
-    ("participant" (t = <IDENTIFIER>) {System.out.println("participant: "+t.image);)+
+    <CONVERSATION> t = <IDENTIFIER> {System.out.println("conversation: "+t.image);} <SEMICOLON>
+    (<PARTICIPANT> t = <IDENTIFIER> {System.out.println("participant: "+t.image);} <SEMICOLON>)+
+
+    ( TopicNode(jjtThis) )*
+
     <EOF>
     {return jjtThis;}
 }
+
+ASTTopicNode TopicNode(ASTConversationTopLevel parent) #ASTTopicNode : {
+    Token t;
+} {
+    [<STARTING>] <TOPIC> <LBRACE>
+    ( BeatNode(jjtThis) )*
+    <RBRACE>
+
+    {return jjtThis;}
+}
+
