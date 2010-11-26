@@ -10,6 +10,25 @@
 <project name="ConversationAPI" default="default" basedir=".">
     <description>Builds, tests, and runs the project ConversationAPI.</description>
     <import file="nbproject/build-impl.xml"/>
+
+    <target name="build-parser">
+        <jjtree
+            target="src/conversation/parser/gen.jjt"
+            outputdirectory="src/conversation/parser"
+            javacchome="lib"
+            nodeusesparser="true"
+            nodepackage="conversation.parser"
+        />
+        <javacc
+            target="src/conversation/parser/gen.jj"
+            outputdirectory="src/conversation/parser"
+            javacchome="lib"
+            buildparser="true"
+        />
+    </target>
+
+    <target name="-pre-compile" depends="build-parser"/>
+
     <!--
 
     There exist several targets which are by default empty and which can be 

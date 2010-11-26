@@ -13,18 +13,18 @@ import java.util.List;
  */
 public class Conversation {
 
-    private List<DialogueNode> allNodes = new ArrayList<DialogueNode>();
-    private List<DialogueBeat> allBeats = new ArrayList<DialogueBeat>();
+//    private List<DialogueNode> allNodes = new ArrayList<DialogueNode>();
+//    private List<DialogueBeat> allBeats = new ArrayList<DialogueBeat>();
     private List<Topic> allTopics = new ArrayList<Topic>();
     private ConversationState initialState = new ConversationState();
 
-    public List<DialogueBeat> getAllBeats() {
-        return allBeats;
-    }
-
-    public List<DialogueNode> getAllNodes() {
-        return allNodes;
-    }
+//    public List<DialogueBeat> getAllBeats() {
+//        return allBeats;
+//    }
+//
+//    public List<DialogueNode> getAllNodes() {
+//        return allNodes;
+//    }
 
     public List<Topic> getAllTopics() {
         return allTopics;

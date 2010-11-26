@@ -82,6 +82,7 @@ public class Runtime {
                 next = getNodeAfterGroupEnd(currentGroup);
             } else {
                 // need to choose the next one
+                // ********** IMPORTANT: this may not be enabled given conditions. What to do otherwise?
                 next = currentGroup.getNodes().get(lastIndex + 1);
             }
         } else {
