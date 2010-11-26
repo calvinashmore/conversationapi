@@ -134,6 +134,15 @@ TOKEN :
   >
 }
 
+/* KEYWORDS */
+
+TOKEN :
+{
+    < CONVERSATION: "conversation" >
+|   < PARTICIPANT: "participant" >
+}
+
+
 /* IDENTIFIERS */
 
 TOKEN :
@@ -272,7 +281,8 @@ ASTConversationTopLevel ConversationTopLevel()                       : {/*@bgen(
 } {/*@bgen(jjtree) ConversationTopLevel */
     try {
 /*@egen*/
-    (t = <IDENTIFIER>)
+    <CONVERSATION> t = <IDENTIFIER> {System.out.println("conversation: "+t.image);} <SEMICOLON>
+    (<PARTICIPANT> t = <IDENTIFIER> {System.out.println("participant: "+t.image);} <SEMICOLON>)+
     <EOF>/*@bgen(jjtree)*/
     {
       jjtree.closeNodeScope(jjtn000, true);
