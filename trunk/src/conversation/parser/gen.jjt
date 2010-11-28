@@ -280,23 +280,61 @@ TOKEN :
 
 ASTConversationTopLevel ConversationTopLevel() #ConversationTopLevel : {
     Token t;
+    ASTTopicNode topic;
 } {
-    <CONVERSATION> t = <IDENTIFIER> {System.out.println("conversation: "+t.image);} <SEMICOLON>
-    (<PARTICIPANT> t = <IDENTIFIER> {System.out.println("participant: "+t.image);} <SEMICOLON>)+
+    <CONVERSATION> t = <IDENTIFIER> {jjtThis.setName(t.image);} <SEMICOLON>
+    (<PARTICIPANT> t = <IDENTIFIER> {jjtThis.addParticipant(t.image);} <SEMICOLON>)+
 
-    ( TopicNode(jjtThis) )*
+    ( topic = TopicNode() {jjtThis.addTopic(topic);} )*
 
     <EOF>
     {return jjtThis;}
 }
 
-ASTTopicNode TopicNode(ASTConversationTopLevel parent) #ASTTopicNode : {
+ASTTopicNode TopicNode() #TopicNode : {
     Token t;
+    ASTBeatNode beat;
 } {
-    [<STARTING>] <TOPIC> <LBRACE>
-    ( BeatNode(jjtThis) )*
+    [<STARTING> {jjtThis.setStarting(true);}] <TOPIC> [t = <IDENTIFIER> {jjtThis.setName(t.image);}] <LBRACE>
+    ( beat = BeatNode() {jjtThis.addBeat(beat);} )*
     <RBRACE>
 
     {return jjtThis;}
 }
 
+ASTBeatNode BeatNode() #BeatNode : {
+    Token t;
+    ASTGroupNode root;
+} {
+    [<STARTING> {jjtThis.setStarting(true);}] <BEAT>
+    root = GroupNode() {jjtThis.setRoot(root);}
+    {return jjtThis;}
+}
+
+ASTGroupNode GroupNode() #GroupNode : {
+    Token t;
+    ASTLeafNode leaf;
+    ASTGroupNode group;
+} {
+    (t = <SEQ> | t = <OP>) {jjtThis.setType(t.image);} <LBRACE>
+        (
+        leaf = LeafNode() {jjtThis.addLeaf(leaf);}
+        | group = GroupNode() {jjtThis.addGroup(group);}
+        | <BEAT> <BREAK> {jjtThis.addBeatBreak();}
+        | <TOPIC> <BREAK> {jjtThis.addTopicBreak();}
+        )+
+    <RBRACE>
+
+    {return jjtThis;}
+}
+
+ASTLeafNode LeafNode() #LeafNode : {
+    Token t;
+} {
+    <NODE> <LBRACE>
+    t = <IDENTIFIER> {jjtThis.setSpeaker(t.image);} <COMMA>
+    t = <STRING_LITERAL> {jjtThis.setContent(t.image);}
+    <RBRACE>
+
+    {return jjtThis;}
+}

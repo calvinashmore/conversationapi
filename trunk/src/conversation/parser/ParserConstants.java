@@ -17,57 +17,64 @@ public interface ParserConstants {
   int STRING_LITERAL = 20;
   int CONVERSATION = 21;
   int PARTICIPANT = 22;
-  int IDENTIFIER = 23;
-  int LETTER = 24;
-  int DIGIT = 25;
-  int LPAREN = 26;
-  int RPAREN = 27;
-  int LBRACE = 28;
-  int RBRACE = 29;
-  int LBRACKET = 30;
-  int RBRACKET = 31;
-  int SEMICOLON = 32;
-  int COMMA = 33;
-  int DOT = 34;
-  int AT = 35;
-  int ASSIGN = 36;
-  int LT = 37;
-  int BANG = 38;
-  int TILDE = 39;
-  int HOOK = 40;
-  int COLON = 41;
-  int EQ = 42;
-  int LE = 43;
-  int GE = 44;
-  int NE = 45;
-  int SC_OR = 46;
-  int SC_AND = 47;
-  int INCR = 48;
-  int DECR = 49;
-  int PLUS = 50;
-  int MINUS = 51;
-  int STAR = 52;
-  int SLASH = 53;
-  int BIT_AND = 54;
-  int BIT_OR = 55;
-  int XOR = 56;
-  int REM = 57;
-  int LSHIFT = 58;
-  int PLUSASSIGN = 59;
-  int MINUSASSIGN = 60;
-  int STARASSIGN = 61;
-  int SLASHASSIGN = 62;
-  int ANDASSIGN = 63;
-  int ORASSIGN = 64;
-  int XORASSIGN = 65;
-  int REMASSIGN = 66;
-  int LSHIFTASSIGN = 67;
-  int RSIGNEDSHIFTASSIGN = 68;
-  int RUNSIGNEDSHIFTASSIGN = 69;
-  int ELLIPSIS = 70;
-  int RUNSIGNEDSHIFT = 71;
-  int RSIGNEDSHIFT = 72;
-  int GT = 73;
+  int STARTING = 23;
+  int TOPIC = 24;
+  int BEAT = 25;
+  int NODE = 26;
+  int OP = 27;
+  int SEQ = 28;
+  int BREAK = 29;
+  int IDENTIFIER = 30;
+  int LETTER = 31;
+  int DIGIT = 32;
+  int LPAREN = 33;
+  int RPAREN = 34;
+  int LBRACE = 35;
+  int RBRACE = 36;
+  int LBRACKET = 37;
+  int RBRACKET = 38;
+  int SEMICOLON = 39;
+  int COMMA = 40;
+  int DOT = 41;
+  int AT = 42;
+  int ASSIGN = 43;
+  int LT = 44;
+  int BANG = 45;
+  int TILDE = 46;
+  int HOOK = 47;
+  int COLON = 48;
+  int EQ = 49;
+  int LE = 50;
+  int GE = 51;
+  int NE = 52;
+  int SC_OR = 53;
+  int SC_AND = 54;
+  int INCR = 55;
+  int DECR = 56;
+  int PLUS = 57;
+  int MINUS = 58;
+  int STAR = 59;
+  int SLASH = 60;
+  int BIT_AND = 61;
+  int BIT_OR = 62;
+  int XOR = 63;
+  int REM = 64;
+  int LSHIFT = 65;
+  int PLUSASSIGN = 66;
+  int MINUSASSIGN = 67;
+  int STARASSIGN = 68;
+  int SLASHASSIGN = 69;
+  int ANDASSIGN = 70;
+  int ORASSIGN = 71;
+  int XORASSIGN = 72;
+  int REMASSIGN = 73;
+  int LSHIFTASSIGN = 74;
+  int RSIGNEDSHIFTASSIGN = 75;
+  int RUNSIGNEDSHIFTASSIGN = 76;
+  int ELLIPSIS = 77;
+  int RUNSIGNEDSHIFT = 78;
+  int RSIGNEDSHIFT = 79;
+  int GT = 80;
 
   int DEFAULT = 0;
   int IN_SINGLE_LINE_COMMENT = 1;
@@ -98,6 +105,13 @@ public interface ParserConstants {
     "<STRING_LITERAL>",
     "\"conversation\"",
     "\"participant\"",
+    "\"starting\"",
+    "\"topic\"",
+    "\"beat\"",
+    "\"node\"",
+    "\"op\"",
+    "\"seq\"",
+    "\"break\"",
     "<IDENTIFIER>",
     "<LETTER>",
     "<DIGIT>",
