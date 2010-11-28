@@ -5,9 +5,17 @@ package conversation.parser;
 public interface ParserTreeConstants
 {
   public int JJTCONVERSATIONTOPLEVEL = 0;
+  public int JJTTOPICNODE = 1;
+  public int JJTBEATNODE = 2;
+  public int JJTGROUPNODE = 3;
+  public int JJTLEAFNODE = 4;
 
 
   public String[] jjtNodeName = {
     "ConversationTopLevel",
+    "TopicNode",
+    "BeatNode",
+    "GroupNode",
+    "LeafNode",
   };
 }

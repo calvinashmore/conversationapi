@@ -140,6 +140,13 @@ TOKEN :
 {
     < CONVERSATION: "conversation" >
 |   < PARTICIPANT: "participant" >
+|   < STARTING: "starting" >
+|   < TOPIC: "topic" >
+|   < BEAT: "beat" >
+|   < NODE: "node" >
+|   < OP: "op" >
+|   < SEQ: "seq" >
+|   < BREAK: "break" >
 }
 
 
@@ -272,17 +279,21 @@ TOKEN :
 
 
 ASTConversationTopLevel ConversationTopLevel()                       : {/*@bgen(jjtree) ConversationTopLevel */
-        ASTConversationTopLevel jjtn000 = new ASTConversationTopLevel(this, JJTCONVERSATIONTOPLEVEL);
-        boolean jjtc000 = true;
-        jjtree.openNodeScope(jjtn000);
-        jjtreeOpenNodeScope(jjtn000);
+    ASTConversationTopLevel jjtn000 = new ASTConversationTopLevel(this, JJTCONVERSATIONTOPLEVEL);
+    boolean jjtc000 = true;
+    jjtree.openNodeScope(jjtn000);
+    jjtreeOpenNodeScope(jjtn000);
 /*@egen*/
-	Token t;
+    Token t;
+    ASTTopicNode topic;
 } {/*@bgen(jjtree) ConversationTopLevel */
     try {
 /*@egen*/
-    <CONVERSATION> t = <IDENTIFIER> {System.out.println("conversation: "+t.image);} <SEMICOLON>
-    (<PARTICIPANT> t = <IDENTIFIER> {System.out.println("participant: "+t.image);} <SEMICOLON>)+
+    <CONVERSATION> t = <IDENTIFIER> {jjtn000.setName(t.image);} <SEMICOLON>
+    (<PARTICIPANT> t = <IDENTIFIER> {jjtn000.addParticipant(t.image);} <SEMICOLON>)+
+
+    ( topic = TopicNode() {jjtn000.addTopic(topic);} )*
+
     <EOF>/*@bgen(jjtree)*/
     {
       jjtree.closeNodeScope(jjtn000, true);
@@ -290,6 +301,190 @@ ASTConversationTopLevel ConversationTopLevel()                       : {/*@bgen(
       jjtreeCloseNodeScope(jjtn000);
     }
 /*@egen*/
+    {return jjtn000;}/*@bgen(jjtree)*/
+    } catch (Throwable jjte000) {
+      if (jjtc000) {
+        jjtree.clearNodeScope(jjtn000);
+        jjtc000 = false;
+      } else {
+        jjtree.popNode();
+      }
+      if (jjte000 instanceof RuntimeException) {
+        throw (RuntimeException)jjte000;
+      }
+      if (jjte000 instanceof ParseException) {
+        throw (ParseException)jjte000;
+      }
+      throw (Error)jjte000;
+    } finally {
+      if (jjtc000) {
+        jjtree.closeNodeScope(jjtn000, true);
+        jjtreeCloseNodeScope(jjtn000);
+      }
+    }
+/*@egen*/
+}
+
+ASTTopicNode TopicNode()            : {/*@bgen(jjtree) TopicNode */
+    ASTTopicNode jjtn000 = new ASTTopicNode(this, JJTTOPICNODE);
+    boolean jjtc000 = true;
+    jjtree.openNodeScope(jjtn000);
+    jjtreeOpenNodeScope(jjtn000);
+/*@egen*/
+    Token t;
+    ASTBeatNode beat;
+} {/*@bgen(jjtree) TopicNode */
+    try {
+/*@egen*/
+    [<STARTING> {jjtn000.setStarting(true);}] <TOPIC> [t = <IDENTIFIER> {jjtn000.setName(t.image);}] <LBRACE>
+    ( beat = BeatNode() {jjtn000.addBeat(beat);} )*
+    <RBRACE>/*@bgen(jjtree)*/
+    {
+      jjtree.closeNodeScope(jjtn000, true);
+      jjtc000 = false;
+      jjtreeCloseNodeScope(jjtn000);
+    }
+/*@egen*/
+
+    {return jjtn000;}/*@bgen(jjtree)*/
+    } catch (Throwable jjte000) {
+      if (jjtc000) {
+        jjtree.clearNodeScope(jjtn000);
+        jjtc000 = false;
+      } else {
+        jjtree.popNode();
+      }
+      if (jjte000 instanceof RuntimeException) {
+        throw (RuntimeException)jjte000;
+      }
+      if (jjte000 instanceof ParseException) {
+        throw (ParseException)jjte000;
+      }
+      throw (Error)jjte000;
+    } finally {
+      if (jjtc000) {
+        jjtree.closeNodeScope(jjtn000, true);
+        jjtreeCloseNodeScope(jjtn000);
+      }
+    }
+/*@egen*/
+}
+
+ASTBeatNode BeatNode()           : {/*@bgen(jjtree) BeatNode */
+    ASTBeatNode jjtn000 = new ASTBeatNode(this, JJTBEATNODE);
+    boolean jjtc000 = true;
+    jjtree.openNodeScope(jjtn000);
+    jjtreeOpenNodeScope(jjtn000);
+/*@egen*/
+    Token t;
+    ASTGroupNode root;
+} {/*@bgen(jjtree) BeatNode */
+    try {
+/*@egen*/
+    [<STARTING> {jjtn000.setStarting(true);}] <BEAT>
+    root = GroupNode() {jjtn000.setRoot(root);}/*@bgen(jjtree)*/
+    {
+      jjtree.closeNodeScope(jjtn000, true);
+      jjtc000 = false;
+      jjtreeCloseNodeScope(jjtn000);
+    }
+/*@egen*/
+    {return jjtn000;}/*@bgen(jjtree)*/
+    } catch (Throwable jjte000) {
+      if (jjtc000) {
+        jjtree.clearNodeScope(jjtn000);
+        jjtc000 = false;
+      } else {
+        jjtree.popNode();
+      }
+      if (jjte000 instanceof RuntimeException) {
+        throw (RuntimeException)jjte000;
+      }
+      if (jjte000 instanceof ParseException) {
+        throw (ParseException)jjte000;
+      }
+      throw (Error)jjte000;
+    } finally {
+      if (jjtc000) {
+        jjtree.closeNodeScope(jjtn000, true);
+        jjtreeCloseNodeScope(jjtn000);
+      }
+    }
+/*@egen*/
+}
+
+ASTGroupNode GroupNode()            : {/*@bgen(jjtree) GroupNode */
+    ASTGroupNode jjtn000 = new ASTGroupNode(this, JJTGROUPNODE);
+    boolean jjtc000 = true;
+    jjtree.openNodeScope(jjtn000);
+    jjtreeOpenNodeScope(jjtn000);
+/*@egen*/
+    Token t;
+    ASTLeafNode leaf;
+    ASTGroupNode group;
+} {/*@bgen(jjtree) GroupNode */
+    try {
+/*@egen*/
+    (t = <SEQ> | t = <OP>) {jjtn000.setType(t.image);} <LBRACE>
+        (
+        leaf = LeafNode() {jjtn000.addLeaf(leaf);}
+        | group = GroupNode() {jjtn000.addGroup(group);}
+        | <BEAT> <BREAK> {jjtn000.addBeatBreak();}
+        | <TOPIC> <BREAK> {jjtn000.addTopicBreak();}
+        )+
+    <RBRACE>/*@bgen(jjtree)*/
+    {
+      jjtree.closeNodeScope(jjtn000, true);
+      jjtc000 = false;
+      jjtreeCloseNodeScope(jjtn000);
+    }
+/*@egen*/
+
+    {return jjtn000;}/*@bgen(jjtree)*/
+    } catch (Throwable jjte000) {
+      if (jjtc000) {
+        jjtree.clearNodeScope(jjtn000);
+        jjtc000 = false;
+      } else {
+        jjtree.popNode();
+      }
+      if (jjte000 instanceof RuntimeException) {
+        throw (RuntimeException)jjte000;
+      }
+      if (jjte000 instanceof ParseException) {
+        throw (ParseException)jjte000;
+      }
+      throw (Error)jjte000;
+    } finally {
+      if (jjtc000) {
+        jjtree.closeNodeScope(jjtn000, true);
+        jjtreeCloseNodeScope(jjtn000);
+      }
+    }
+/*@egen*/
+}
+
+ASTLeafNode LeafNode()           : {/*@bgen(jjtree) LeafNode */
+    ASTLeafNode jjtn000 = new ASTLeafNode(this, JJTLEAFNODE);
+    boolean jjtc000 = true;
+    jjtree.openNodeScope(jjtn000);
+    jjtreeOpenNodeScope(jjtn000);
+/*@egen*/
+    Token t;
+} {/*@bgen(jjtree) LeafNode */
+    try {
+/*@egen*/
+    <NODE> <LBRACE>
+    t = <IDENTIFIER> {jjtn000.setSpeaker(t.image);} <COMMA>
+    t = <STRING_LITERAL> {jjtn000.setContent(t.image);}
+    <RBRACE>/*@bgen(jjtree)*/
+    {
+      jjtree.closeNodeScope(jjtn000, true);
+      jjtc000 = false;
+      jjtreeCloseNodeScope(jjtn000);
+    }
+/*@egen*/
+
     {return jjtn000;}/*@bgen(jjtree)*/
     } finally {
       if (jjtc000) {
