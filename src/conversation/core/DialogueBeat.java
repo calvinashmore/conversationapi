@@ -13,14 +13,14 @@ public class DialogueBeat {
     //private DialogueNode initiatingNode;
     // initiating nodes are handled through NodeGroups.
     final private Condition condition;
-    final private Topic topic; // the topic to which this beat belongs
+    Topic topic; // the topic to which this beat belongs
     final private String description; // optional?
     final private boolean starting; // whether this is a beat that can start a topic.
     final private NodeGroup root;
 
     protected DialogueBeat(Builder builder) {
         this.condition = builder.condition;
-        this.topic = builder.topic;
+//        this.topic = builder.topic;
         this.description = builder.description;
         this.starting = builder.starting;
         this.root = builder.root;
@@ -49,13 +49,15 @@ public class DialogueBeat {
     public static class Builder {
 
         public Condition condition = Condition.TRUE_CONDITION;
-        public Topic topic;
+//        public Topic topic;
         public String description;
         public boolean starting;
         public NodeGroup root;
 
         public DialogueBeat build() {
-            return new DialogueBeat(this);
+            DialogueBeat beat = new DialogueBeat(this);
+            root.finish(beat, null);
+            return beat;
         }
     }
 }

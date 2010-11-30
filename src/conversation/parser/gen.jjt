@@ -147,6 +147,7 @@ TOKEN :
 |   < OP: "op" >
 |   < SEQ: "seq" >
 |   < BREAK: "break" >
+|   < END: "end" >
 }
 
 
@@ -322,6 +323,7 @@ ASTGroupNode GroupNode() #GroupNode : {
         | group = GroupNode() {jjtThis.addGroup(group);}
         | <BEAT> <BREAK> {jjtThis.addBeatBreak();}
         | <TOPIC> <BREAK> {jjtThis.addTopicBreak();}
+        | <END> <CONVERSATION> {jjtThis.addEndConversation();}
         )+
     <RBRACE>
 

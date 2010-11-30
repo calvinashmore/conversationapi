@@ -36,6 +36,25 @@ public class Runtime {
     private Map<Topic, RuntimeTopic> deployedTopics = new HashMap<Topic, RuntimeTopic>();
     private Map<DialogueBeat, RuntimeBeat> deployedBeats = new HashMap<DialogueBeat, RuntimeBeat>();
     private Map<DialogueNode, RuntimeNode> deployedNodes = new HashMap<DialogueNode, RuntimeNode>();
+    private Listener listener;
+
+    public void setListener(Listener listener) {
+        this.listener = listener;
+    }
+
+    public interface Listener {
+
+        public void onNewNode(DialogueNode node);
+
+        public void onNewBeat(DialogueBeat beat);
+
+        public void onNewTopic(Topic topic);
+    }
+
+    public interface RuntimeSelector {
+
+        public DialogueNode choose(List<DialogueNode> choices);
+    }
 
     public Runtime(Conversation conversation) {
         this.conversation = conversation;
@@ -60,6 +79,35 @@ public class Runtime {
         }
 
         deploy(group, firstNode);
+    }
+
+    /**
+     * returns false if there are no more legal moves?
+     * @param selector
+     * @return
+     */
+    public boolean step(RuntimeSelector selector) {
+        List<Pair<NodeGroup, DialogueNode>> currentNodeChoices = getCurrentNodeChoices();
+        if (currentNodeChoices.isEmpty()) {
+            return false;
+        }
+
+        List<DialogueNode> nodeList = new ArrayList<DialogueNode>();
+        for (Pair<NodeGroup, DialogueNode> pair : currentNodeChoices) {
+            nodeList.add(pair.getRight());
+        }
+
+        // perform the choice
+        DialogueNode choice = selector.choose(nodeList);
+
+        // deploy it
+        for (Pair<NodeGroup, DialogueNode> pair : currentNodeChoices) {
+            if (pair.getRight() == choice) {
+                deploy(pair.getLeft(), choice);
+                break;
+            }
+        }
+        return true;
     }
 
     /**
@@ -213,6 +261,12 @@ public class Runtime {
         if (newBeat) {
             runtimeTopic.addBeat(runtimeBeat);
         }
+
+        if(currentTopic != runtimeTopic)
+            listener.onNewTopic(topic);
+        if(currentBeat != runtimeBeat)
+            listener.onNewBeat(beat);
+        listener.onNewNode(node);
 
         currentTopic = runtimeTopic;
         currentBeat = runtimeBeat;

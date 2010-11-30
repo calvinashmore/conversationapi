@@ -18,7 +18,17 @@ public class NodeGroup extends Node {
         this.type = builder.type;
         this.nodes = Collections.unmodifiableList(new ArrayList<Node>(builder.nodes));
 //        this.starting = builder.starting;
-        this.parent = builder.parent;
+//        this.parent = builder.parent;
+    }
+
+    void finish(DialogueBeat beat, NodeGroup parent) {
+        for (Node node : nodes) {
+            if (node instanceof NodeGroup) {
+                ((NodeGroup) node).finish(beat, this);
+            } else if (node instanceof DialogueNode) {
+                ((DialogueNode) node).beat = beat;
+            }
+        }
     }
 
     public static enum Type {
@@ -45,13 +55,12 @@ public class NodeGroup extends Node {
 //    public boolean isStarting() {
 //        return starting;
 //    }
-
     public static class Builder {
 
         public Type type;
         public List<Node> nodes = new ArrayList<Node>();
 //        public boolean starting;
-        public NodeGroup parent;
+//        public NodeGroup parent;
 
         public NodeGroup build() {
             return new NodeGroup(this);
