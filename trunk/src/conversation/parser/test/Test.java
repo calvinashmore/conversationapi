@@ -29,7 +29,7 @@ public class Test {
 
         Parser parser = new Parser(new FileInputStream("src/test.conversation"));
         ASTConversationTopLevel ConversationTopLevel = parser.ConversationTopLevel();
-        Converter converter = new Converter(new Builder(), new conversation.core.NodeGroup.Builder(), new conversation.core.DialogueBeat.Builder(), new conversation.core.Topic.Builder());
+        Converter converter = new Converter(new Builder(), new conversation.core.DialogueBeat.Builder(), new conversation.core.Topic.Builder());
         Conversation conversation = converter.buildConversation(ConversationTopLevel);
         
         
@@ -54,6 +54,7 @@ public class Test {
 
             private Random random = new Random();
             public DialogueNode choose(List<DialogueNode> choices) {
+                System.out.println("choosing among: "+choices);
                 return choices.get(random.nextInt(choices.size()));
             }
         };
@@ -63,7 +64,7 @@ public class Test {
         runtime.startConversation();
 
         while(runtime.step(selector)) {
-            System.out.println("djfkls");
+            // do nothing
         }
 
     }
