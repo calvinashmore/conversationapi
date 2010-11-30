@@ -51,7 +51,11 @@ public class Topic {
         public List<DialogueBeat> beats = new ArrayList<DialogueBeat>();
 
         public Topic build() {
-            return new Topic(this);
+            Topic topic = new Topic(this);
+            for (DialogueBeat dialogueBeat : topic.beats) {
+                dialogueBeat.topic = topic;
+            }
+            return topic;
         }
     }
 }

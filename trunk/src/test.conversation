@@ -4,3 +4,20 @@ participant rick;
 participant brian;
 
 
+
+starting topic welcome {
+    starting beat seq {
+        node {rick, "Hey there"}
+        node {rick, "I bought you a latte, but it's a bit cold now."}
+
+        op {
+            beat break
+            seq {
+                node {brian, "..."}
+                topic break
+            }
+        }
+    }
+
+    
+}

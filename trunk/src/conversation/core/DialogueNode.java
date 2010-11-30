@@ -15,7 +15,7 @@ import java.util.List;
 public class DialogueNode extends Node {
 
     final private String description; // optional?
-    final private DialogueBeat beat; // the beat to which this node belongs
+    DialogueBeat beat; // the beat to which this node belongs
     final private DialogueAgent agent; // the agent who speaks this node. This IS a part of the authoring, not the runtime.
     final private Condition condition;
 //    final private boolean starting; // whether this node can start a beat.
@@ -24,7 +24,7 @@ public class DialogueNode extends Node {
 
     protected DialogueNode(Builder builder) {
         this.description = builder.description;
-        this.beat = builder.beat;
+//        this.beat = builder.beat;
         this.agent = builder.agent;
         this.condition = builder.condition;
 //        this.starting = builder.starting;
@@ -64,7 +64,7 @@ public class DialogueNode extends Node {
     public static class Builder {
 
         public String description; // optional?
-        public DialogueBeat beat; // the beat to which this node belongs
+//        public DialogueBeat beat; // the beat to which this node belongs
         public DialogueAgent agent; // the agent who speaks this node. This IS a part of the authoring, not the runtime.
         public Condition condition = Condition.TRUE_CONDITION;
 //        public boolean starting; // whether this node can start a beat.

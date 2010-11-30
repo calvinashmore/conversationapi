@@ -10,6 +10,8 @@ public class ASTGroupNode extends ParseNode implements GroupContents {
     };
     public static final GroupContents TOPIC_BREAK = new GroupContents() {
     };
+    public static final GroupContents END_CONVERSATION = new GroupContents() {
+    };
     private List<GroupContents> contents = new ArrayList<GroupContents>();
     private String type;
 
@@ -35,6 +37,10 @@ public class ASTGroupNode extends ParseNode implements GroupContents {
 
     public void addTopicBreak() {
         contents.add(TOPIC_BREAK);
+    }
+
+    public void addEndConversation() {
+        contents.add(END_CONVERSATION);
     }
 
     public List<GroupContents> getContents() {
