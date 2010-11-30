@@ -23,13 +23,13 @@ public class Converter {
 
     //private DialogueNode.Builder nodeBuilder;
     private BasicNode.Builder nodeBuilder;
-    private NodeGroup.Builder groupBuilder;
+//    private NodeGroup.Builder groupBuilder;
     private DialogueBeat.Builder beatBuilder;
     private Topic.Builder topicBuilder;
 
-    public Converter(BasicNode.Builder nodeBuilder, NodeGroup.Builder groupBuilder, DialogueBeat.Builder beatBuilder, Topic.Builder topicBuilder) {
+    public Converter(BasicNode.Builder nodeBuilder, DialogueBeat.Builder beatBuilder, Topic.Builder topicBuilder) {
         this.nodeBuilder = nodeBuilder;
-        this.groupBuilder = groupBuilder;
+//        this.groupBuilder = groupBuilder;
         this.beatBuilder = beatBuilder;
         this.topicBuilder = topicBuilder;
     }
@@ -75,7 +75,10 @@ public class Converter {
         return beatBuilder.build();
     }
 
+
     protected NodeGroup buildGroup(ASTGroupNode groupNode) {
+
+        NodeGroup.Builder groupBuilder = new NodeGroup.Builder();
         String type = groupNode.getType();
         if (type.equals("op")) {
             groupBuilder.type = NodeGroup.Type.optional;

@@ -4,7 +4,6 @@
  */
 package conversation.basic;
 
-import conversation.core.ConversationState;
 import conversation.core.DialogueNode;
 
 /**
@@ -22,6 +21,11 @@ public class BasicNode extends DialogueNode {
     protected BasicNode(Builder builder) {
         super(builder);
         this.content = builder.content;
+    }
+
+    @Override
+    public String toString() {
+        return content;
     }
 
     public static class Builder extends DialogueNode.Builder {

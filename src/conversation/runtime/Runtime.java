@@ -123,9 +123,9 @@ public class Runtime {
         Node next;
         if (currentGroup.getType() == NodeGroup.Type.sequential) {
             // get the placement of the last node.
-            int lastIndex = currentGroup.getNodes().indexOf(lastNode);
+            int lastIndex = currentGroup.getNodes().indexOf(lastNode.getNode());
 
-            if (currentGroup.getNodes().size() >= lastIndex - 1) {
+            if (currentGroup.getNodes().size() <= lastIndex - 1) {
                 // need to go up a level
                 next = getNodeAfterGroupEnd(currentGroup);
             } else {
@@ -148,7 +148,7 @@ public class Runtime {
 
         // we have a node, there are several things it can be:
         // either a dialouge node, a group, or a break.
-        return getChoicesFromNode(next);
+        return getChoicesFromNode(currentGroup, next);
 
         // look in the current group, manipulate.
         // if we are in a block which provides a topic or beat break, search those too.
@@ -172,10 +172,10 @@ public class Runtime {
         return parent.getNodes().get(lastIndex + 1);
     }
 
-    private List<Pair<NodeGroup, DialogueNode>> getChoicesFromNode(Node node) {
+    private List<Pair<NodeGroup, DialogueNode>> getChoicesFromNode(NodeGroup parent, Node node) {
         if (node instanceof DialogueNode) {
             // this is the simple case.
-            Pair<NodeGroup, DialogueNode> pair = new Pair<NodeGroup, DialogueNode>(currentGroup, (DialogueNode) node);
+            Pair<NodeGroup, DialogueNode> pair = new Pair<NodeGroup, DialogueNode>(parent, (DialogueNode) node);
             return Collections.singletonList(pair);
         } else if (node instanceof NodeGroup) {
             // entering a NEW NodeGroup, so start from the top.
@@ -184,12 +184,12 @@ public class Runtime {
                 // return all options if we hit an optional node group.
                 List<Pair<NodeGroup, DialogueNode>> r = new ArrayList<Pair<NodeGroup, DialogueNode>>();
                 for (Node option : ng.getNodes()) {
-                    r.addAll(getChoicesFromNode(option));
+                    r.addAll(getChoicesFromNode(ng, option));
                 }
                 return r;
             } else if (ng.getType() == NodeGroup.Type.sequential) {
                 // return only the search results from the first element if we hit a sequential group.
-                return getChoicesFromNode(ng.getNodes().get(0));
+                return getChoicesFromNode(ng, ng.getNodes().get(0));
             } else {
                 // should not get here
                 return null;
@@ -352,6 +352,6 @@ public class Runtime {
      * @return
      */
     private List<Pair<NodeGroup, DialogueNode>> getChoicesInBeat(DialogueBeat beat) {
-        return getChoicesFromNode(beat.getRoot());
+        return getChoicesFromNode(beat.getRoot(), beat.getRoot());
     }
 }
