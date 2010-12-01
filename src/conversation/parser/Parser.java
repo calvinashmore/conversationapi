@@ -278,6 +278,7 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, ParserConsta
     DialogueNode.Builder builder = new DialogueNode.Builder();
     Condition condition;
     Map<String, Object> attributes;
+    List<Effect> effects;
     jj_consume_token(NODE);
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case IDENTIFIER:
@@ -300,15 +301,16 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, ParserConsta
     }
     attributes = Attributes();
                                    builder.attributes = attributes;
+    effects = Effects();
+                             builder.effects = effects;
     jj_consume_token(RBRACE);
      {if (true) return builder.build();}
     throw new Error("Missing return statement in function");
   }
 
-  final public Map<String, Object> Attributes() throws ParseException {
-    Token key;
-    Token value;
-    Map<String, Object> r = new HashMap<String, Object>();
+  final public List<Effect> Effects() throws ParseException {
+    List<Effect> r = new ArrayList<Effect>();
+    Effect effect;
     label_5:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -319,30 +321,88 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, ParserConsta
         jj_la1[11] = jj_gen;
         break label_5;
       }
-      key = jj_consume_token(IDENTIFIER);
-      jj_consume_token(COLON);
+      effect = Effect();
+                        r.add(effect);
+    }
+     {if (true) return r;}
+    throw new Error("Missing return statement in function");
+  }
+
+  final public Effect Effect() throws ParseException {
+    Token t;
+    Object value;
+    Effect effect;
+    t = jj_consume_token(IDENTIFIER);
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case ASSIGN:
+      jj_consume_token(ASSIGN);
+      value = Value();
+                                    effect = new SetFlagEffect(t.image, value);
+      break;
+    case INCR:
+      jj_consume_token(INCR);
+                  effect = new IncrementFlagEffect(t.image);
+      break;
+    case DECR:
+      jj_consume_token(DECR);
+                  effect = new DecrementFlagEffect(t.image);
+      break;
+    default:
+      jj_la1[12] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+     {if (true) return effect;}
+    throw new Error("Missing return statement in function");
+  }
+
+// literal or identifier
+  final public Object Value() throws ParseException {
+    Object result;
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case FLOATING_POINT_LITERAL:
+      value = jj_consume_token(FLOATING_POINT_LITERAL);
+                                            Double.valueOf(value.image);
+      break;
+    case INTEGER_LITERAL:
+      value = jj_consume_token(INTEGER_LITERAL);
+                                     Integer.valueOf(value.image);
+      break;
+    case STRING_LITERAL:
+      value = jj_consume_token(STRING_LITERAL);
+                                    value.image.substring(1,value.image.length()-2);
+      break;
+    case IDENTIFIER:
+      value = jj_consume_token(IDENTIFIER);
+                                result = value.image;
+      break;
+    default:
+      jj_la1[13] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+     {if (true) return result;}
+    throw new Error("Missing return statement in function");
+  }
+
+  final public Map<String, Object> Attributes() throws ParseException {
+    Token key;
+    Object value;
+    Map<String, Object> r = new HashMap<String, Object>();
+    label_6:
+    while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case FLOATING_POINT_LITERAL:
-        value = jj_consume_token(FLOATING_POINT_LITERAL);
-                                            r.put(key.image, Double.valueOf(value.image));
-        break;
-      case INTEGER_LITERAL:
-        value = jj_consume_token(INTEGER_LITERAL);
-                                     r.put(key.image, Integer.valueOf(value.image));
-        break;
-      case STRING_LITERAL:
-        value = jj_consume_token(STRING_LITERAL);
-                                    r.put(key.image, value.image.substring(1,value.image.length()-2));
-        break;
       case IDENTIFIER:
-        value = jj_consume_token(IDENTIFIER);
-                                r.put(key.image, value.image);
+        ;
         break;
       default:
-        jj_la1[12] = jj_gen;
-        jj_consume_token(-1);
-        throw new ParseException();
+        jj_la1[14] = jj_gen;
+        break label_6;
       }
+      key = jj_consume_token(IDENTIFIER);
+      jj_consume_token(COLON);
+      value = Value();
+                                                  r.put(key.image, value);
     }
      {if (true) return r;}
     throw new Error("Missing return statement in function");
@@ -375,7 +435,7 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, ParserConsta
                         r = new LogicVariable(t.image);
       break;
     default:
-      jj_la1[13] = jj_gen;
+      jj_la1[15] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -393,7 +453,7 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, ParserConsta
     case BANG:
       r = Condition();
                      body.add(r);
-      label_6:
+      label_7:
       while (true) {
         jj_consume_token(SC_AND);
         r = Condition();
@@ -403,14 +463,14 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, ParserConsta
           ;
           break;
         default:
-          jj_la1[14] = jj_gen;
-          break label_6;
+          jj_la1[16] = jj_gen;
+          break label_7;
         }
       }
                                                       r = new MultiAnd(body);
       break;
     case SC_OR:
-      label_7:
+      label_8:
       while (true) {
         jj_consume_token(SC_OR);
         r = Condition();
@@ -420,15 +480,15 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, ParserConsta
           ;
           break;
         default:
-          jj_la1[15] = jj_gen;
-          break label_7;
+          jj_la1[17] = jj_gen;
+          break label_8;
         }
       }
                                                      r = new MultiOr(body);
      {if (true) return r;}
       break;
     default:
-      jj_la1[16] = jj_gen;
+      jj_la1[18] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -440,7 +500,7 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, ParserConsta
   public Token token, jj_nt;
   private int jj_ntk;
   private int jj_gen;
-  final private int[] jj_la1 = new int[17];
+  final private int[] jj_la1 = new int[19];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static private int[] jj_la1_2;
@@ -450,13 +510,13 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, ParserConsta
       jj_la1_2();
    }
    private static void jj_la1_0() {
-      jj_la1_0 = new int[] {0x400000,0x1800000,0x800000,0x0,0x2800000,0x800000,0x18000000,0x5f000000,0x5f000000,0x0,0x80000000,0x0,0x122000,0x0,0x0,0x0,0x0,};
+      jj_la1_0 = new int[] {0x400000,0x1800000,0x800000,0x0,0x2800000,0x800000,0x18000000,0x5f000000,0x5f000000,0x0,0x80000000,0x0,0x0,0x122000,0x0,0x0,0x0,0x0,0x0,};
    }
    private static void jj_la1_1() {
-      jj_la1_1 = new int[] {0x0,0x0,0x0,0x1,0x0,0x0,0x0,0x0,0x0,0x1,0x0,0x1,0x1,0x8009,0x1000000,0x800000,0x808009,};
+      jj_la1_1 = new int[] {0x0,0x0,0x0,0x1,0x0,0x0,0x0,0x0,0x0,0x1,0x0,0x1,0x6002000,0x1,0x1,0x8009,0x1000000,0x800000,0x808009,};
    }
    private static void jj_la1_2() {
-      jj_la1_2 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
+      jj_la1_2 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
    }
 
   public Parser(java.io.InputStream stream) {
@@ -468,7 +528,7 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, ParserConsta
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 19; i++) jj_la1[i] = -1;
   }
 
   public void ReInit(java.io.InputStream stream) {
@@ -481,7 +541,7 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, ParserConsta
     jj_ntk = -1;
     jjtree.reset();
     jj_gen = 0;
-    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 19; i++) jj_la1[i] = -1;
   }
 
   public Parser(java.io.Reader stream) {
@@ -490,7 +550,7 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, ParserConsta
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 19; i++) jj_la1[i] = -1;
   }
 
   public void ReInit(java.io.Reader stream) {
@@ -500,7 +560,7 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, ParserConsta
     jj_ntk = -1;
     jjtree.reset();
     jj_gen = 0;
-    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 19; i++) jj_la1[i] = -1;
   }
 
   public Parser(ParserTokenManager tm) {
@@ -508,7 +568,7 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, ParserConsta
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 19; i++) jj_la1[i] = -1;
   }
 
   public void ReInit(ParserTokenManager tm) {
@@ -517,7 +577,7 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, ParserConsta
     jj_ntk = -1;
     jjtree.reset();
     jj_gen = 0;
-    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 19; i++) jj_la1[i] = -1;
   }
 
   final private Token jj_consume_token(int kind) throws ParseException {
@@ -572,7 +632,7 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, ParserConsta
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 17; i++) {
+    for (int i = 0; i < 19; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
