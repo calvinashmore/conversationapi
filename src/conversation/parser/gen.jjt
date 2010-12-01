@@ -16,6 +16,10 @@ options {
 PARSER_BEGIN(Parser)
 
 package conversation.parser;
+import conversation.core.*;
+import conversation.core.conditions.*;
+import conversation.core.effects.*;
+import java.util.*;
 
 public class Parser {
 
@@ -148,6 +152,7 @@ TOKEN :
 |   < SEQ: "seq" >
 |   < BREAK: "break" >
 |   < END: "end" >
+|   < WHEN: "when" >
 }
 
 
@@ -312,7 +317,7 @@ ASTBeatNode BeatNode() #BeatNode : {
     {return jjtThis;}
 }
 
-ASTGroupNode GroupNode() #GroupNode : {
+NodeGroup GroupNode() #void : {
     Token t;
     ASTLeafNode leaf;
     ASTGroupNode group;
@@ -330,13 +335,62 @@ ASTGroupNode GroupNode() #GroupNode : {
     {return jjtThis;}
 }
 
-ASTLeafNode LeafNode() #LeafNode : {
+DialogueNode LeafNode() #void : {
     Token t;
+    DialogueNode.Builder builder = new DialogueNode.Builder();
+    Condition condition;
+    Map<String, Object> attributes;
 } {
-    <NODE> <LBRACE>
-    t = <IDENTIFIER> {jjtThis.setSpeaker(t.image);} <COMMA>
-    t = <STRING_LITERAL> {jjtThis.setContent(t.image);}
+    <NODE> [t = <IDENTIFIER> {builder.label = t.image;}] <LBRACE>
+        [condition = When() {builder.condition = condition;}]
+        attributes = Attributes() {builder.attributes = attributes;}
     <RBRACE>
 
-    {return jjtThis;}
+    {return builder.build();}
 }
+
+Map<String, Object> Attributes() #void : {
+    Token key;
+    Token value;
+    Map<String, Object> r = new HashMap<String, Object>();
+} {
+    ( key = <IDENTIFIER> <COLON> (
+          value = <FLOATING_POINT_LITERAL> {r.put(key.image, Double.valueOf(value.image));}
+        | value = <INTEGER_LITERAL> {r.put(key.image, Integer.valueOf(value.image));}
+        | value = <STRING_LITERAL> {r.put(key.image, value.image.substring(1,value.image.length()-2));}
+        | value = <IDENTIFIER> {r.put(key.image, value.image);}
+    ) )*
+    {return r;}
+}
+
+Condition When() #void : {
+    Condition result;
+} {
+    <WHEN> result = Condition()
+    {return result;}
+}
+
+Condition Condition() #void : {
+    Condition r;
+    Token t;
+} {
+    ( <LPAREN> r = Condition1() <RPAREN>
+    | <BANG> r = Condition() {r = new Not(r);}
+    | t = <IDENTIFIER> {r = new LogicVariable(t.image);}
+    )
+    {return r;}
+}
+
+// for and, or blocks.
+Condition Condition1() #void : {
+    Condition r;
+    List<Condition> body = new ArrayList<Condition>(); // body for and/or blocks.
+} {
+    r = Condition() {body.add(r);}
+
+        ( (<SC_AND> r = Condition() {body.add(r);})+ {r = new MultiAnd(body);} )
+    |   ( (<SC_OR> r = Condition() {body.add(r);})+ {r = new MultiOr(body);} )
+
+    {return r;}
+}
+

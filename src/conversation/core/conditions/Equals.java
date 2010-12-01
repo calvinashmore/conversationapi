@@ -2,25 +2,27 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package conversation.utils.logic;
+package conversation.core.conditions;
+
+import conversation.core.ConversationState;
 
 /**
  *
  * @author Calvin Ashmore
  */
-class Equals extends LogicExpression {
+public class Equals extends Condition {
 
-    private LogicExpression left;
-    private LogicExpression right;
+    private Condition left;
+    private Condition right;
 
     // other constructor?
-    public Equals(LogicExpression left, LogicExpression right) {
+    public Equals(Condition left, Condition right) {
         this.left = left;
         this.right = right;
     }
 
     @Override
-    public boolean evaluate(LogicContext context) {
+    public boolean evaluate(ConversationState context) {
         boolean leftResult = left.evaluate(context);
         boolean rightResult = right.evaluate(context);
 

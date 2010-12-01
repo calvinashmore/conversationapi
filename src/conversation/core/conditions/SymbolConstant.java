@@ -2,13 +2,15 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package conversation.utils.logic;
+package conversation.core.conditions;
+
+import conversation.core.ConversationState;
 
 /**
  *
  * @author Calvin Ashmore
  */
-class SymbolConstant extends SymbolExpression {
+public class SymbolConstant extends SymbolExpression {
 
     private Object value;
 
@@ -17,7 +19,7 @@ class SymbolConstant extends SymbolExpression {
     }
 
     @Override
-    public Object evaluate(LogicContext context) {
+    public Object evaluate(ConversationState context) {
         return value;
     }
 }

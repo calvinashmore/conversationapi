@@ -4,20 +4,32 @@
  */
 package conversation.core;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  *
  * @author Calvin Ashmore
  */
-public class DialogueAgent {
+final public class DialogueAgent {
 
-    private String name; // or id?
+//    private String name; // or id?
+    private String nickname;
+    private Map<String, Object> attributes = new HashMap<String, Object>();
 
-    public String getName() {
-        return name;
+    public Map<String, Object> getAttributes() {
+        return attributes;
     }
 
-    public DialogueAgent(String name) {
-        this.name = name;
+//    public String getName() {
+//        return name;
+//    }
+    public String getNickname() {
+        return nickname;
+    }
+
+    public DialogueAgent(String nickname) {
+        this.nickname = nickname;
     }
     // information for mood or state??
     // maybe make this a final class which has state variables. Client code can

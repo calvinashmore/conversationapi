@@ -42,13 +42,13 @@ public final class ConversationState {
         clearOnTopic.add(name);
     }
 
-    public void newBeat() {
+    void newBeat() {
         for (String flagName : clearOnBeat) {
             stateData.remove(flagName);
         }
     }
 
-    public void newTopic() {
+    void newTopic() {
         for (String flagName : clearOnTopic) {
             stateData.remove(flagName);
         }
