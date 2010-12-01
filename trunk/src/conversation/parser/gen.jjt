@@ -153,6 +153,7 @@ TOKEN :
 |   < BREAK: "break" >
 |   < END: "end" >
 |   < WHEN: "when" >
+|   < DO: "do" >
 }
 
 
@@ -340,26 +341,56 @@ DialogueNode LeafNode() #void : {
     DialogueNode.Builder builder = new DialogueNode.Builder();
     Condition condition;
     Map<String, Object> attributes;
+    List<Effect> effects;
 } {
     <NODE> [t = <IDENTIFIER> {builder.label = t.image;}] <LBRACE>
         [condition = When() {builder.condition = condition;}]
         attributes = Attributes() {builder.attributes = attributes;}
+        effects = Effects() {builder.effects = effects;}
     <RBRACE>
 
     {return builder.build();}
 }
 
+List<Effect> Effects() #void : {
+    List<Effect> r = new ArrayList<Effect>();
+    Effect effect;
+} {
+    (effect = Effect() {r.add(effect);})*
+    {return r;}
+}
+
+Effect Effect() #void : {
+    Token t;
+    Object value;
+    Effect effect;
+} {
+    t = <IDENTIFIER> (
+          <ASSIGN> value = Value() {effect = new SetFlagEffect(t.image, value);}
+        | <INCR> {effect = new IncrementFlagEffect(t.image);}
+        | <DECR> {effect = new DecrementFlagEffect(t.image);}
+    )
+    {return effect;}
+}
+
+// literal or identifier
+Object Value() #void : {
+    Object result;
+} {
+    (     value = <FLOATING_POINT_LITERAL> {Double.valueOf(value.image);}
+        | value = <INTEGER_LITERAL> {Integer.valueOf(value.image);}
+        | value = <STRING_LITERAL> {value.image.substring(1,value.image.length()-2);}
+        | value = <IDENTIFIER> {result = value.image;}
+    )
+    {return result;}
+}
+
 Map<String, Object> Attributes() #void : {
     Token key;
-    Token value;
+    Object value;
     Map<String, Object> r = new HashMap<String, Object>();
 } {
-    ( key = <IDENTIFIER> <COLON> (
-          value = <FLOATING_POINT_LITERAL> {r.put(key.image, Double.valueOf(value.image));}
-        | value = <INTEGER_LITERAL> {r.put(key.image, Integer.valueOf(value.image));}
-        | value = <STRING_LITERAL> {r.put(key.image, value.image.substring(1,value.image.length()-2));}
-        | value = <IDENTIFIER> {r.put(key.image, value.image);}
-    ) )*
+    ( key = <IDENTIFIER> <COLON> value = Value() {r.put(key.image, value);})*
     {return r;}
 }
 
