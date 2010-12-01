@@ -2,23 +2,25 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package conversation.utils.logic;
+package conversation.core.conditions;
+
+import conversation.core.ConversationState;
 
 /**
  *
  * @author Calvin Ashmore
  */
-public class LessThan extends LogicExpression {
+public class GreaterThanOrEqualTo extends Condition {
 
     SymbolExpression left;
     SymbolExpression right;
 
     @Override
-    public boolean evaluate(LogicContext context) {
+    public boolean evaluate(ConversationState context) {
 
         Number leftValue = (Number) left.evaluate(context);
         Number rightValue = (Number) right.evaluate(context);
 
-        return leftValue.doubleValue() < rightValue.doubleValue();
+        return leftValue.doubleValue() >= rightValue.doubleValue();
     }
 }

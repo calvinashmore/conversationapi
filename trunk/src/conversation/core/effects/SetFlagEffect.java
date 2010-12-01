@@ -2,7 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package conversation.core;
+package conversation.core.effects;
+
+import conversation.core.ConversationState;
 
 /**
  *

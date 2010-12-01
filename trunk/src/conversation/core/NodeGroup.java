@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @author Calvin Ashmore
  */
-public class NodeGroup extends Node {
+final public class NodeGroup extends Node {
 
     protected NodeGroup(Builder builder) {
         this.type = builder.type;
@@ -55,7 +55,7 @@ public class NodeGroup extends Node {
 //    public boolean isStarting() {
 //        return starting;
 //    }
-    public static class Builder {
+    final public static class Builder {
 
         public Type type;
         public List<Node> nodes = new ArrayList<Node>();

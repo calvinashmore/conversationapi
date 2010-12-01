@@ -4,8 +4,7 @@
  */
 package conversation.parser;
 
-import conversation.basic.BasicNode;
-import conversation.core.Condition;
+import conversation.core.conditions.Condition;
 import conversation.core.Conversation;
 import conversation.core.DialogueAgent;
 import conversation.core.DialogueBeat;
@@ -21,17 +20,7 @@ import java.util.Map;
  */
 public class Converter {
 
-    //private DialogueNode.Builder nodeBuilder;
-    private BasicNode.Builder nodeBuilder;
-//    private NodeGroup.Builder groupBuilder;
-    private DialogueBeat.Builder beatBuilder;
-    private Topic.Builder topicBuilder;
-
-    public Converter(BasicNode.Builder nodeBuilder, DialogueBeat.Builder beatBuilder, Topic.Builder topicBuilder) {
-        this.nodeBuilder = nodeBuilder;
-//        this.groupBuilder = groupBuilder;
-        this.beatBuilder = beatBuilder;
-        this.topicBuilder = topicBuilder;
+    public Converter() {
     }
     private Map<String, DialogueAgent> agents;
 
@@ -54,6 +43,7 @@ public class Converter {
     }
 
     protected Topic buildTopic(ASTTopicNode topicNode) {
+        Topic.Builder topicBuilder = new Topic.Builder();
         topicBuilder.condition = Condition.TRUE_CONDITION;
         topicBuilder.description = topicNode.getName();
         topicBuilder.starting = topicNode.isStarting();
@@ -68,13 +58,13 @@ public class Converter {
     }
 
     protected DialogueBeat buildBeat(ASTBeatNode beatNode) {
+        DialogueBeat.Builder beatBuilder = new DialogueBeat.Builder();
         beatBuilder.condition = Condition.TRUE_CONDITION;
         beatBuilder.description = "";
         beatBuilder.starting = beatNode.isStarting();
         beatBuilder.root = buildGroup(beatNode.getRoot());
         return beatBuilder.build();
     }
-
 
     protected NodeGroup buildGroup(ASTGroupNode groupNode) {
 
@@ -105,9 +95,9 @@ public class Converter {
 
     protected DialogueNode buildNode(ASTLeafNode leafNode) {
 
-        nodeBuilder.agent = agents.get(leafNode.getSpeaker());
+        DialogueNode.Builder nodeBuilder = new DialogueNode.Builder();
+//        nodeBuilder.agent = agents.get(leafNode.getSpeaker());
         nodeBuilder.condition = Condition.TRUE_CONDITION;
-        nodeBuilder.content = leafNode.getContent();
         return nodeBuilder.build();
     }
 }

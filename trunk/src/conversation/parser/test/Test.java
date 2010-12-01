@@ -4,8 +4,6 @@
  */
 package conversation.parser.test;
 
-import conversation.basic.BasicNode;
-import conversation.basic.BasicNode.Builder;
 import conversation.core.Conversation;
 import conversation.core.DialogueBeat;
 import conversation.core.DialogueNode;

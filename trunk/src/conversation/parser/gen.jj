@@ -13,6 +13,10 @@ options {
 PARSER_BEGIN(Parser)
 
 package conversation.parser;
+import conversation.core.*;
+import conversation.core.conditions.*;
+import conversation.core.effects.*;
+import java.util.*;
 
 public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants/*@egen*/ {/*@bgen(jjtree)*/
   protected JJTParserState jjtree = new JJTParserState();
@@ -147,6 +151,8 @@ TOKEN :
 |   < OP: "op" >
 |   < SEQ: "seq" >
 |   < BREAK: "break" >
+|   < END: "end" >
+|   < WHEN: "when" >
 }
 
 
@@ -413,84 +419,80 @@ ASTBeatNode BeatNode()           : {/*@bgen(jjtree) BeatNode */
 /*@egen*/
 }
 
-ASTGroupNode GroupNode()            : {/*@bgen(jjtree) GroupNode */
-    ASTGroupNode jjtn000 = new ASTGroupNode(this, JJTGROUPNODE);
-    boolean jjtc000 = true;
-    jjtree.openNodeScope(jjtn000);
-    jjtreeOpenNodeScope(jjtn000);
-/*@egen*/
+NodeGroup GroupNode()       : {
     Token t;
     ASTLeafNode leaf;
     ASTGroupNode group;
-} {/*@bgen(jjtree) GroupNode */
-    try {
-/*@egen*/
+} {
     (t = <SEQ> | t = <OP>) {jjtn000.setType(t.image);} <LBRACE>
         (
         leaf = LeafNode() {jjtn000.addLeaf(leaf);}
         | group = GroupNode() {jjtn000.addGroup(group);}
         | <BEAT> <BREAK> {jjtn000.addBeatBreak();}
         | <TOPIC> <BREAK> {jjtn000.addTopicBreak();}
+        | <END> <CONVERSATION> {jjtn000.addEndConversation();}
         )+
-    <RBRACE>/*@bgen(jjtree)*/
-    {
-      jjtree.closeNodeScope(jjtn000, true);
-      jjtc000 = false;
-      jjtreeCloseNodeScope(jjtn000);
-    }
-/*@egen*/
+    <RBRACE>
 
-    {return jjtn000;}/*@bgen(jjtree)*/
-    } catch (Throwable jjte000) {
-      if (jjtc000) {
-        jjtree.clearNodeScope(jjtn000);
-        jjtc000 = false;
-      } else {
-        jjtree.popNode();
-      }
-      if (jjte000 instanceof RuntimeException) {
-        throw (RuntimeException)jjte000;
-      }
-      if (jjte000 instanceof ParseException) {
-        throw (ParseException)jjte000;
-      }
-      throw (Error)jjte000;
-    } finally {
-      if (jjtc000) {
-        jjtree.closeNodeScope(jjtn000, true);
-        jjtreeCloseNodeScope(jjtn000);
-      }
-    }
-/*@egen*/
+    {return jjtn000;}
 }
 
-ASTLeafNode LeafNode()           : {/*@bgen(jjtree) LeafNode */
-    ASTLeafNode jjtn000 = new ASTLeafNode(this, JJTLEAFNODE);
-    boolean jjtc000 = true;
-    jjtree.openNodeScope(jjtn000);
-    jjtreeOpenNodeScope(jjtn000);
-/*@egen*/
+DialogueNode LeafNode()       : {
     Token t;
-} {/*@bgen(jjtree) LeafNode */
-    try {
-/*@egen*/
-    <NODE> <LBRACE>
-    t = <IDENTIFIER> {jjtn000.setSpeaker(t.image);} <COMMA>
-    t = <STRING_LITERAL> {jjtn000.setContent(t.image);}
-    <RBRACE>/*@bgen(jjtree)*/
-    {
-      jjtree.closeNodeScope(jjtn000, true);
-      jjtc000 = false;
-      jjtreeCloseNodeScope(jjtn000);
-    }
-/*@egen*/
+    DialogueNode.Builder builder = new DialogueNode.Builder();
+    Condition condition;
+    Map<String, Object> attributes;
+} {
+    <NODE> [t = <IDENTIFIER> {builder.label = t.image;}] <LBRACE>
+        [condition = When() {builder.condition = condition;}]
+        attributes = Attributes() {builder.attributes = attributes;}
+    <RBRACE>
 
-    {return jjtn000;}/*@bgen(jjtree)*/
-    } finally {
-      if (jjtc000) {
-        jjtree.closeNodeScope(jjtn000, true);
-        jjtreeCloseNodeScope(jjtn000);
-      }
-    }
-/*@egen*/
+    {return builder.build();}
 }
+
+Map<String, Object> Attributes()       : {
+    Token key;
+    Token value;
+    Map<String, Object> r = new HashMap<String, Object>();
+} {
+    ( key = <IDENTIFIER> <COLON> (
+          value = <FLOATING_POINT_LITERAL> {r.put(key.image, Double.valueOf(value.image));}
+        | value = <INTEGER_LITERAL> {r.put(key.image, Integer.valueOf(value.image));}
+        | value = <STRING_LITERAL> {r.put(key.image, value.image.substring(1,value.image.length()-2));}
+        | value = <IDENTIFIER> {r.put(key.image, value.image);}
+    ) )*
+    {return r;}
+}
+
+Condition When()       : {
+    Condition result;
+} {
+    <WHEN> result = Condition()
+    {return result;}
+}
+
+Condition Condition()       : {
+    Condition r;
+    Token t;
+} {
+    ( <LPAREN> r = Condition1() <RPAREN>
+    | <BANG> r = Condition() {r = new Not(r);}
+    | t = <IDENTIFIER> {r = new LogicVariable(t.image);}
+    )
+    {return r;}
+}
+
+// for and, or blocks.
+Condition Condition1()       : {
+    Condition r;
+    List<Condition> body = new ArrayList<Condition>(); // body for and/or blocks.
+} {
+    r = Condition() {body.add(r);}
+
+        ( (<SC_AND> r = Condition() {body.add(r);})+ {r = new MultiAnd(body);} )
+    |   ( (<SC_OR> r = Condition() {body.add(r);})+ {r = new MultiOr(body);} )
+
+    {return r;}
+}
+

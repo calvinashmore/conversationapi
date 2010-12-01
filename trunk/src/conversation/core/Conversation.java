@@ -30,7 +30,7 @@ public class Conversation {
 //    }
 
     public void addAgent(DialogueAgent agent) {
-        agents.put(agent.getName(), agent);
+        agents.put(agent.getNickname(), agent);
     }
 
     public DialogueAgent getAgent(String name) {

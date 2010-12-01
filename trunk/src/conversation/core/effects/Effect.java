@@ -3,7 +3,9 @@
  * and open the template in the editor.
  */
 
-package conversation.core;
+package conversation.core.effects;
+
+import conversation.core.ConversationState;
 
 /**
  * this is an effect on the conversation state that a node may have

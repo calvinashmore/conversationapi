@@ -2,26 +2,27 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package conversation.utils.logic;
+package conversation.core.conditions;
 
+import conversation.core.ConversationState;
 import java.util.List;
 
 /**
  *
  * @author Calvin Ashmore
  */
-class MultiOr extends LogicExpression {
+public class MultiOr extends Condition {
 
-    private List<LogicExpression> expressions;
+    private List<Condition> expressions;
 
-    public MultiOr(List<LogicExpression> expressions) {
+    public MultiOr(List<Condition> expressions) {
         this.expressions = expressions;
     }
 
     @Override
-    public boolean evaluate(LogicContext context) {
+    public boolean evaluate(ConversationState context) {
 
-        for (LogicExpression logicExpression : expressions) {
+        for (Condition logicExpression : expressions) {
             if(logicExpression.evaluate(context))
                 return true;
         }
