@@ -12,6 +12,7 @@ import conversation.core.Node;
 import conversation.core.NodeGroup;
 import conversation.core.NodeLink;
 import conversation.core.Topic;
+import conversation.core.effects.Effect;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -89,7 +90,7 @@ public class Runtime {
      */
     public boolean step(RuntimeSelector selector) {
         List<Pair<NodeGroup, DialogueNode>> currentNodeChoices = getCurrentNodeChoices();
-        if (currentNodeChoices.isEmpty()) {
+        if (currentNodeChoices == null || currentNodeChoices.isEmpty()) {
             return false;
         }
 
@@ -126,7 +127,7 @@ public class Runtime {
             // get the placement of the last node.
             int lastIndex = currentGroup.getNodes().indexOf(lastNode.getNode());
 
-            if (currentGroup.getNodes().size() <= lastIndex - 1) {
+            if (currentGroup.getNodes().size() <= lastIndex + 1) {
                 // need to go up a level
                 next = getNodeAfterGroupEnd(currentGroup);
             } else {
@@ -201,13 +202,13 @@ public class Runtime {
             NodeLink nl = (NodeLink) node;
             Node target = nl.getNode(parent.getBeat());
 
-            if(target == null) {
+            if (target == null) {
                 // should not happen, but you know....
-                throw new IllegalStateException("NodeLink could not find target: "+nl.getTarget());
+                throw new IllegalStateException("NodeLink could not find target: " + nl.getTarget());
             }
             return getChoicesFromNode(parent, target);
 
-        }else if (node == Node.BEAT_BREAK) {
+        } else if (node == Node.BEAT_BREAK) {
             // this is a beat break ONLY. We have to select a new beat within the topic.
             return getChoicesInTopic(currentTopic.getTopic(), false);
         } else if (node == Node.TOPIC_BREAK) {
@@ -274,16 +275,22 @@ public class Runtime {
             runtimeTopic.addBeat(runtimeBeat);
         }
 
-        if(currentTopic != runtimeTopic)
+        if (currentTopic != runtimeTopic) {
             listener.onNewTopic(topic);
-        if(currentBeat != runtimeBeat)
+        }
+        if (currentBeat != runtimeBeat) {
             listener.onNewBeat(beat);
+        }
         listener.onNewNode(node);
 
         currentTopic = runtimeTopic;
         currentBeat = runtimeBeat;
         lastNode = runtimeNode;
         currentGroup = group; // needs more?
+
+        for (Effect effect : node.getEffects()) {
+            effect.apply(currentState);
+        }
     }
     // private random variable for use in select
     private static final Random random = new Random();
