@@ -10,17 +10,35 @@ participant brian {
 
 
 starting topic welcome {
-    starting beat {
+    starting beat intro {
         seq {
-            node {rick, "Hey there"}
-            node {rick, "I bought you a latte, but it's a bit cold now."}
+            node {speaker: rick, text: "Hey there"}
+            node {speaker: rick, text: "I bought you a latte, but it's a bit cold now."}
 
             op {
                 beat break
                 seq {
-                    node {brian, "..."}
+                    node {speaker: brian, text:"..." set sullen++;}
                     topic break
                 }
+            }
+        }
+    }
+
+    beat reaction {
+        op {
+            seq {
+                node {speaker: brian, text:"yeah, sorry about that" set apologetic++;}
+                node {speaker: rick, text:"no worries"}
+                op{beat break topic break}
+            }
+            seq {
+                node {speaker: brian, text:"how long were you waiting?"}
+                node {speaker: rick, text:"oh not too long."}
+                node {speaker: rick, text:"just a minute or two."}
+                // NEED TO BE ABLE TO LINK the above sequence as an option here.
+                //op {sorry beat break topic break}
+                op {beat break topic break}
             }
         }
     }

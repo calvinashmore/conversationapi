@@ -21,9 +21,8 @@ public class Parser implements ParserConstants {
     jj_consume_token(SEMICOLON);
     label_1:
     while (true) {
-      jj_consume_token(PARTICIPANT);
       participant = Participant();
-                                                c.addAgent(participant);
+                                  c.addAgent(participant);
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case PARTICIPANT:
         ;
@@ -312,12 +311,35 @@ public class Parser implements ParserConstants {
     Token t;
     Object value;
     Effect effect;
+    SetFlagEffect.ClearState clearState = SetFlagEffect.ClearState.never;
     t = jj_consume_token(IDENTIFIER);
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case ASSIGN:
       jj_consume_token(ASSIGN);
       value = Value();
-                                    effect = new SetFlagEffect(t.image, value);
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case CLEAR:
+        jj_consume_token(CLEAR);
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case BEAT:
+          jj_consume_token(BEAT);
+                                                      clearState = SetFlagEffect.ClearState.beat;
+          break;
+        case TOPIC:
+          jj_consume_token(TOPIC);
+                                                                                                              clearState = SetFlagEffect.ClearState.topic;
+          break;
+        default:
+          jj_la1[17] = jj_gen;
+          jj_consume_token(-1);
+          throw new ParseException();
+        }
+        break;
+      default:
+        jj_la1[18] = jj_gen;
+        ;
+      }
+             effect = new SetFlagEffect(t.image, value, clearState);
       break;
     case INCR:
       jj_consume_token(INCR);
@@ -328,7 +350,7 @@ public class Parser implements ParserConstants {
                   effect = new DecrementFlagEffect(t.image);
       break;
     default:
-      jj_la1[17] = jj_gen;
+      jj_la1[19] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -339,26 +361,26 @@ public class Parser implements ParserConstants {
 // literal or identifier
   final public Object Value() throws ParseException {
     Token value;
-    Object result = null;
+    Object result;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case FLOATING_POINT_LITERAL:
       value = jj_consume_token(FLOATING_POINT_LITERAL);
-                                            Double.valueOf(value.image);
+                                            result = Double.valueOf(value.image);
       break;
     case INTEGER_LITERAL:
       value = jj_consume_token(INTEGER_LITERAL);
-                                     Integer.valueOf(value.image);
+                                     result = Integer.valueOf(value.image);
       break;
     case STRING_LITERAL:
       value = jj_consume_token(STRING_LITERAL);
-                                    value.image.substring(1,value.image.length()-2);
+                                    result = value.image.substring(1,value.image.length()-1);
       break;
     case IDENTIFIER:
       value = jj_consume_token(IDENTIFIER);
                                 result = value.image;
       break;
     default:
-      jj_la1[18] = jj_gen;
+      jj_la1[20] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -370,20 +392,32 @@ public class Parser implements ParserConstants {
     Token key;
     Object value;
     Map<String, Object> r = new HashMap<String, Object>();
-    label_6:
-    while (true) {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case IDENTIFIER:
-        ;
-        break;
-      default:
-        jj_la1[19] = jj_gen;
-        break label_6;
-      }
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case IDENTIFIER:
       key = jj_consume_token(IDENTIFIER);
       jj_consume_token(COLON);
       value = Value();
                                                   r.put(key.image, value);
+      label_6:
+      while (true) {
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case COMMA:
+          ;
+          break;
+        default:
+          jj_la1[21] = jj_gen;
+          break label_6;
+        }
+        jj_consume_token(COMMA);
+        key = jj_consume_token(IDENTIFIER);
+        jj_consume_token(COLON);
+        value = Value();
+                                                          r.put(key.image, value);
+      }
+      break;
+    default:
+      jj_la1[22] = jj_gen;
+      ;
     }
      {if (true) return r;}
     throw new Error("Missing return statement in function");
@@ -416,7 +450,7 @@ public class Parser implements ParserConstants {
                         r = new LogicVariable(t.image);
       break;
     default:
-      jj_la1[20] = jj_gen;
+      jj_la1[23] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -444,7 +478,7 @@ public class Parser implements ParserConstants {
           ;
           break;
         default:
-          jj_la1[21] = jj_gen;
+          jj_la1[24] = jj_gen;
           break label_7;
         }
       }
@@ -461,7 +495,7 @@ public class Parser implements ParserConstants {
           ;
           break;
         default:
-          jj_la1[22] = jj_gen;
+          jj_la1[25] = jj_gen;
           break label_8;
         }
       }
@@ -469,7 +503,7 @@ public class Parser implements ParserConstants {
      {if (true) return r;}
       break;
     default:
-      jj_la1[23] = jj_gen;
+      jj_la1[26] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -481,7 +515,7 @@ public class Parser implements ParserConstants {
   public Token token, jj_nt;
   private int jj_ntk;
   private int jj_gen;
-  final private int[] jj_la1 = new int[24];
+  final private int[] jj_la1 = new int[27];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static private int[] jj_la1_2;
@@ -491,13 +525,13 @@ public class Parser implements ParserConstants {
       jj_la1_2();
    }
    private static void jj_la1_0() {
-      jj_la1_0 = new int[] {0x400000,0x1800000,0x0,0x800000,0x0,0x80000000,0x2800000,0x800000,0x0,0x80000000,0x18000000,0x5f000000,0x5f000000,0x0,0x80000000,0x0,0x0,0x0,0x122000,0x0,0x0,0x0,0x0,0x0,};
+      jj_la1_0 = new int[] {0x400000,0x1800000,0x0,0x800000,0x0,0x80000000,0x2800000,0x800000,0x0,0x80000000,0x18000000,0x5f000000,0x5f000000,0x0,0x80000000,0x0,0x0,0x3000000,0x0,0x0,0x122000,0x0,0x0,0x0,0x0,0x0,0x0,};
    }
    private static void jj_la1_1() {
-      jj_la1_1 = new int[] {0x0,0x0,0x40,0x0,0x2,0x0,0x0,0x0,0x2,0x0,0x0,0x0,0x0,0x2,0x0,0x1,0x2,0xc004000,0x2,0x2,0x10012,0x2000000,0x1000000,0x1010012,};
+      jj_la1_1 = new int[] {0x0,0x0,0x80,0x0,0x4,0x0,0x0,0x0,0x4,0x0,0x0,0x0,0x0,0x4,0x0,0x1,0x4,0x0,0x2,0x18008000,0x4,0x1000,0x4,0x20024,0x4000000,0x2000000,0x2020024,};
    }
    private static void jj_la1_2() {
-      jj_la1_2 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
+      jj_la1_2 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
    }
 
   public Parser(java.io.InputStream stream) {
@@ -509,7 +543,7 @@ public class Parser implements ParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 24; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 27; i++) jj_la1[i] = -1;
   }
 
   public void ReInit(java.io.InputStream stream) {
@@ -521,7 +555,7 @@ public class Parser implements ParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 24; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 27; i++) jj_la1[i] = -1;
   }
 
   public Parser(java.io.Reader stream) {
@@ -530,7 +564,7 @@ public class Parser implements ParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 24; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 27; i++) jj_la1[i] = -1;
   }
 
   public void ReInit(java.io.Reader stream) {
@@ -539,7 +573,7 @@ public class Parser implements ParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 24; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 27; i++) jj_la1[i] = -1;
   }
 
   public Parser(ParserTokenManager tm) {
@@ -547,7 +581,7 @@ public class Parser implements ParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 24; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 27; i++) jj_la1[i] = -1;
   }
 
   public void ReInit(ParserTokenManager tm) {
@@ -555,7 +589,7 @@ public class Parser implements ParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 24; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 27; i++) jj_la1[i] = -1;
   }
 
   final private Token jj_consume_token(int kind) throws ParseException {
@@ -602,15 +636,15 @@ public class Parser implements ParserConstants {
 
   public ParseException generateParseException() {
     jj_expentries.removeAllElements();
-    boolean[] la1tokens = new boolean[84];
-    for (int i = 0; i < 84; i++) {
+    boolean[] la1tokens = new boolean[85];
+    for (int i = 0; i < 85; i++) {
       la1tokens[i] = false;
     }
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 24; i++) {
+    for (int i = 0; i < 27; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
@@ -625,7 +659,7 @@ public class Parser implements ParserConstants {
         }
       }
     }
-    for (int i = 0; i < 84; i++) {
+    for (int i = 0; i < 85; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;
