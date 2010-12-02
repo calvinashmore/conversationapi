@@ -351,18 +351,28 @@ NodeGroup GroupNode()  : {
     DialogueNode leaf;
     NodeGroup group;
     NodeGroup.Builder builder = new NodeGroup.Builder();
+    NodeLink link;
+    Token t;
 } {
-    ( <SEQ> {builder.type = NodeGroup.Type.sequential;} |
-      <OP> {builder.type = NodeGroup.Type.optional;} ) <LBRACE>
+    ( <SEQ> [t = <IDENTIFIER> {builder.label = t.image;}] {builder.type = NodeGroup.Type.sequential;} |
+      <OP> [t = <IDENTIFIER> {builder.label = t.image;}] {builder.type = NodeGroup.Type.optional;} ) <LBRACE>
         ( leaf = LeafNode() {builder.nodes.add(leaf);}
         | group = GroupNode() {builder.nodes.add(group);}
-        | <BEAT> <BREAK> {builder.nodes.add(conversation.core.Node.BEAT_BREAK);}
-        | <TOPIC> <BREAK> {builder.nodes.add(conversation.core.Node.TOPIC_BREAK);}
-        | <END> <CONVERSATION> {builder.nodes.add(conversation.core.Node.CONVERSATION_END);}
+        | link = LinkNode() {builder.nodes.add(link);} [<COMMA>]
+        | <BEAT> <BREAK> {builder.nodes.add(conversation.core.Node.BEAT_BREAK);} [<COMMA>]
+        | <TOPIC> <BREAK> {builder.nodes.add(conversation.core.Node.TOPIC_BREAK);} [<COMMA>]
+        | <END> <CONVERSATION> {builder.nodes.add(conversation.core.Node.CONVERSATION_END);} [<COMMA>]
         )+
     <RBRACE>
 
     {return builder.build();}
+}
+
+NodeLink LinkNode() : {
+    Token t;
+} {
+    <BIT_AND> t = <IDENTIFIER>
+    {return new NodeLink(t.image);}
 }
 
 DialogueNode LeafNode()  : {
@@ -422,8 +432,7 @@ Map<String, Object> Attributes()  : {
     Object value;
     Map<String, Object> r = new HashMap<String, Object>();
 } {
-    [ key = <IDENTIFIER> <COLON> value = Value() {r.put(key.image, value);}
-    ( <COMMA> key = <IDENTIFIER> <COLON> value = Value() {r.put(key.image, value);})* [<COMMA>] ]
+    ( key = <IDENTIFIER> <COLON> value = Value() {r.put(key.image, value);} [<COMMA>] )*
     {return r;}
 }
 
