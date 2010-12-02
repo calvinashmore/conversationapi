@@ -17,11 +17,14 @@ final public class NodeGroup extends Node {
     protected NodeGroup(Builder builder) {
         this.type = builder.type;
         this.nodes = Collections.unmodifiableList(new ArrayList<Node>(builder.nodes));
+        this.label = builder.label;
 //        this.starting = builder.starting;
 //        this.parent = builder.parent;
     }
 
     void finish(DialogueBeat beat, NodeGroup parent) {
+        this.beat = beat;
+        this.parent = parent;
         for (Node node : nodes) {
             if (node instanceof NodeGroup) {
                 ((NodeGroup) node).finish(beat, this);
@@ -35,10 +38,20 @@ final public class NodeGroup extends Node {
 
         optional, sequential
     }
-    private Type type;
-    private List<Node> nodes;
+    final private String label;
+    final private Type type;
+    final private List<Node> nodes;
 //    private boolean starting;
     private NodeGroup parent;
+    private DialogueBeat beat;
+
+    public DialogueBeat getBeat() {
+        return beat;
+    }
+
+    public String getLabel() {
+        return label;
+    }
 
     public NodeGroup getParent() {
         return parent;
@@ -58,6 +71,7 @@ final public class NodeGroup extends Node {
     final public static class Builder {
 
         public Type type;
+        public String label;
         public List<Node> nodes = new ArrayList<Node>();
 //        public boolean starting;
 //        public NodeGroup parent;

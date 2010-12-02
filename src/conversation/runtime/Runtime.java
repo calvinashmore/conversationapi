@@ -10,6 +10,7 @@ import conversation.core.DialogueBeat;
 import conversation.core.DialogueNode;
 import conversation.core.Node;
 import conversation.core.NodeGroup;
+import conversation.core.NodeLink;
 import conversation.core.Topic;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -195,7 +196,18 @@ public class Runtime {
                 return null;
             }
 
-        } else if (node == Node.BEAT_BREAK) {
+        } else if (node instanceof NodeLink) {
+            // hit a link, so attempt to find the targeted node.
+            NodeLink nl = (NodeLink) node;
+            Node target = nl.getNode(parent.getBeat());
+
+            if(target == null) {
+                // should not happen, but you know....
+                throw new IllegalStateException("NodeLink could not find target: "+nl.getTarget());
+            }
+            return getChoicesFromNode(parent, target);
+
+        }else if (node == Node.BEAT_BREAK) {
             // this is a beat break ONLY. We have to select a new beat within the topic.
             return getChoicesInTopic(currentTopic.getTopic(), false);
         } else if (node == Node.TOPIC_BREAK) {
