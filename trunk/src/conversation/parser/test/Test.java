@@ -8,8 +8,6 @@ import conversation.core.Conversation;
 import conversation.core.DialogueBeat;
 import conversation.core.DialogueNode;
 import conversation.core.Topic;
-import conversation.parser.ASTConversationTopLevel;
-import conversation.parser.Converter;
 import conversation.parser.Parser;
 import conversation.runtime.Runtime;
 import java.io.FileInputStream;
@@ -22,29 +20,28 @@ import java.util.Random;
  */
 public class Test {
 
+
     public static void main(String args[]) throws Exception {
 
 
         Parser parser = new Parser(new FileInputStream("src/test.conversation"));
-        ASTConversationTopLevel ConversationTopLevel = parser.ConversationTopLevel();
-        Converter converter = new Converter(new Builder(), new conversation.core.DialogueBeat.Builder(), new conversation.core.Topic.Builder());
-        Conversation conversation = converter.buildConversation(ConversationTopLevel);
-        
+        Conversation conversation = parser.ConversationTopLevel();
+
         
         Runtime runtime = new conversation.runtime.Runtime(conversation);
 
         Runtime.Listener listener = new Runtime.Listener() {
 
             public void onNewNode(DialogueNode node) {
-                System.out.println("new node: "+((BasicNode)node).getContent());
+                System.out.println("new node: "+(node).getAttributes());
             }
 
             public void onNewBeat(DialogueBeat beat) {
-                System.out.println("new beat: "+beat.getDescription());
+                System.out.println("new beat: "+beat.getLabel());
             }
 
             public void onNewTopic(Topic topic) {
-                System.out.println("new topic: "+topic.getDescription());
+                System.out.println("new topic: "+topic.getLabel());
             }
         };
 

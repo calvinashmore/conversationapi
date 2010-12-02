@@ -12,13 +12,13 @@
     <import file="nbproject/build-impl.xml"/>
 
     <target name="build-parser">
-        <jjtree
+<!--        <jjtree
             target="src/conversation/parser/gen.jjt"
             outputdirectory="src/conversation/parser"
             javacchome="lib"
             nodeusesparser="true"
             nodepackage="conversation.parser"
-        />
+        />-->
         <javacc
             target="src/conversation/parser/gen.jj"
             outputdirectory="src/conversation/parser"
