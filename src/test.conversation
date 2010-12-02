@@ -1,20 +1,26 @@
 conversation CoffeeShop;
 
-participant rick;
-participant brian;
+participant rick {
+    name: Rick
+}
 
+participant brian {
+    name: "Brian"
+}
 
 
 starting topic welcome {
-    starting beat seq {
-        node {rick, "Hey there"}
-        node {rick, "I bought you a latte, but it's a bit cold now."}
+    starting beat {
+        seq {
+            node {rick, "Hey there"}
+            node {rick, "I bought you a latte, but it's a bit cold now."}
 
-        op {
-            beat break
-            seq {
-                node {brian, "..."}
-                topic break
+            op {
+                beat break
+                seq {
+                    node {brian, "..."}
+                    topic break
+                }
             }
         }
     }

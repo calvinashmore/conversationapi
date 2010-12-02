@@ -32,6 +32,10 @@ public final class ConversationState {
         stateData.put(name, value);
     }
 
+    public void putAll(Map<String, Object> m) {
+        stateData.putAll(m);
+    }
+
     public void putBeatFlag(String name, Object value) {
         stateData.put(name, value);
         clearOnBeat.add(name);

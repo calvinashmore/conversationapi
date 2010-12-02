@@ -17,6 +17,7 @@ public class Conversation {
 
 //    private List<DialogueNode> allNodes = new ArrayList<DialogueNode>();
 //    private List<DialogueBeat> allBeats = new ArrayList<DialogueBeat>();
+    private String label;
     private List<Topic> allTopics = new ArrayList<Topic>();
     private ConversationState initialState = new ConversationState();
     private Map<String, DialogueAgent> agents = new HashMap<String, DialogueAgent>();
@@ -28,7 +29,6 @@ public class Conversation {
 //    public List<DialogueNode> getAllNodes() {
 //        return allNodes;
 //    }
-
     public void addAgent(DialogueAgent agent) {
         agents.put(agent.getNickname(), agent);
     }
@@ -43,5 +43,13 @@ public class Conversation {
 
     public ConversationState getInitialState() {
         return initialState;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
     }
 }
