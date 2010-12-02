@@ -154,6 +154,7 @@ TOKEN :
 |   < END: "end" >
 |   < WHEN: "when" >
 |   < SET: "set" >
+|   < CLEAR: "clear" >
 }
 
 
@@ -292,7 +293,7 @@ Conversation ConversationTopLevel()  : {
     Topic topic;
 } {
     <CONVERSATION> t = <IDENTIFIER> {c.setLabel(t.image);} <SEMICOLON>
-    (<PARTICIPANT> participant = Participant() {c.addAgent(participant);} )+
+    (participant = Participant() {c.addAgent(participant);} )+
 
     ( topic = TopicNode() {c.getAllTopics().add(topic);} )*
 
@@ -392,9 +393,11 @@ Effect Effect()  : {
     Token t;
     Object value;
     Effect effect;
+    SetFlagEffect.ClearState clearState = SetFlagEffect.ClearState.never;
 } {
     t = <IDENTIFIER> (
-          <ASSIGN> value = Value() {effect = new SetFlagEffect(t.image, value);}
+          <ASSIGN> value = Value() [<CLEAR> ( <BEAT> {clearState = SetFlagEffect.ClearState.beat;} | <TOPIC> {clearState = SetFlagEffect.ClearState.topic;} )]
+            {effect = new SetFlagEffect(t.image, value, clearState);}
         | <INCR> {effect = new IncrementFlagEffect(t.image);}
         | <DECR> {effect = new DecrementFlagEffect(t.image);}
     )
@@ -404,11 +407,11 @@ Effect Effect()  : {
 // literal or identifier
 Object Value()  : {
     Token value;
-    Object result = null;
+    Object result;
 } {
-    (     value = <FLOATING_POINT_LITERAL> {Double.valueOf(value.image);}
-        | value = <INTEGER_LITERAL> {Integer.valueOf(value.image);}
-        | value = <STRING_LITERAL> {value.image.substring(1,value.image.length()-2);}
+    (     value = <FLOATING_POINT_LITERAL> {result = Double.valueOf(value.image);}
+        | value = <INTEGER_LITERAL> {result = Integer.valueOf(value.image);}
+        | value = <STRING_LITERAL> {result = value.image.substring(1,value.image.length()-1);}
         | value = <IDENTIFIER> {result = value.image;}
     )
     {return result;}
@@ -419,7 +422,8 @@ Map<String, Object> Attributes()  : {
     Object value;
     Map<String, Object> r = new HashMap<String, Object>();
 } {
-    ( key = <IDENTIFIER> <COLON> value = Value() {r.put(key.image, value);})*
+    [ key = <IDENTIFIER> <COLON> value = Value() {r.put(key.image, value);}
+    ( <COMMA> key = <IDENTIFIER> <COLON> value = Value() {r.put(key.image, value);})* [<COMMA>] ]
     {return r;}
 }
 
@@ -437,6 +441,7 @@ Condition Condition()  : {
     ( <LPAREN> r = Condition1() <RPAREN>
     | <BANG> r = Condition() {r = new Not(r);}
     | t = <IDENTIFIER> {r = new LogicVariable(t.image);}
+//    | r = TestCondition()
     )
     {return r;}
 }
@@ -454,3 +459,17 @@ Condition Condition1()  : {
     {return r;}
 }
 
+/*
+In terms of getting test conditions to work: probably want to refactor stuff in
+conversation.core.conditions to have a Test class, which has inside of it each of the
+test types (>, >=, <, <=, ==, etc), removing the individual classes.
+Secondly, also have a SymbolOperation class? with Arithmetic things (+,-,/,*, etc)
+
+Condition TestCondition() : {
+    SymbolExpression ex1, ex2;
+
+} {
+    ex1 = SymbolExpression()
+    (<>)
+}
+*/
