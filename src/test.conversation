@@ -36,8 +36,6 @@ starting topic welcome {
                 node {speaker: brian, text:"how long were you waiting?"}
                 node {speaker: rick, text:"oh not too long."}
                 node {speaker: rick, text:"just a minute or two."}
-                // NEED TO BE ABLE TO LINK the above sequence as an option here.
-                //op {sorry, beat break, topic break}
                 op {&sorry, beat break, topic break}
             }
         }
