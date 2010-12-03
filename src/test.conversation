@@ -66,3 +66,30 @@ starting topic welcome {
     }
 }
 
+topic miscellaneous_smalltalk {
+    starting beat {
+        seq {
+            node {speaker: rick, text:"so... how are you?"}
+            op{
+                node {speaker: brian, text:"not too bad"} // generic non-answer
+                node {speaker: brian, text:"pretty good, actually", set cheerful++; positivity++;}
+                node {speaker: brian, text:"eenh, things are okay", set cheerful--;}
+                node {speaker: brian, text:"not great", set positivity--; cheerful--; sullen++;}
+            }
+        }
+    }
+    starting beat {
+        seq {
+            node {speaker: rick, text:"been up to anything exciting?"}
+        }
+    }
+
+    beat {
+        //mood response 1
+        // rick speaks, reacting to brian’s mood
+        when sullen
+        op {
+            node {speaker: rick, text:"What’s wrong?"}
+        }
+    }
+}
