@@ -144,7 +144,15 @@ public class MainPanel extends JPanel {
         if (selectedItem == null) {
             selectionInfo.setText("No selection");
         } else {
-            selectionInfo.setText(selectedItem.getAttributes().toString());
+            String text = selectedItem.getAttributes().toString() + "\n";
+            if (selectedItem.getBeat() != runtime.getCurrentBeat().getBeat()) {
+                text += "new beat\n";
+                if (selectedItem.getBeat().getTopic() != runtime.getCurrentTopic().getTopic()) {
+                    text += "new topic\n";
+                }
+            }
+
+            selectionInfo.setText(text);
         }
     }
 

@@ -40,6 +40,30 @@ public class Runtime {
     private Map<DialogueNode, RuntimeNode> deployedNodes = new HashMap<DialogueNode, RuntimeNode>();
     private Listener listener;
 
+    public Conversation getConversation() {
+        return conversation;
+    }
+
+    public RuntimeBeat getCurrentBeat() {
+        return currentBeat;
+    }
+
+    public NodeGroup getCurrentGroup() {
+        return currentGroup;
+    }
+
+    public ConversationState getCurrentState() {
+        return currentState;
+    }
+
+    public RuntimeTopic getCurrentTopic() {
+        return currentTopic;
+    }
+
+    public RuntimeNode getLastNode() {
+        return lastNode;
+    }
+
     public void setListener(Listener listener) {
         this.listener = listener;
     }
@@ -123,22 +147,27 @@ public class Runtime {
         // we may be able to return quickly. 
         // if we were on a sequential node group, attempt to go to the next
         Node next;
+//System.out.println("getCurrentNodeChoices");
         if (currentGroup.getType() == NodeGroup.Type.sequential) {
             // get the placement of the last node.
             int lastIndex = currentGroup.getNodes().indexOf(lastNode.getNode());
 
             if (currentGroup.getNodes().size() <= lastIndex + 1) {
                 // need to go up a level
+//System.out.println("  end and sequential: getNodeAfterGroupEnd");
                 next = getNodeAfterGroupEnd(currentGroup);
             } else {
                 // need to choose the next one
                 // ********** IMPORTANT: this may not be enabled given conditions. What to do otherwise?
+//System.out.println("  next sequential");
                 next = currentGroup.getNodes().get(lastIndex + 1);
             }
         } else {
             // need to go up a level
+//System.out.println("  end and optional: getNodeAfterGroupEnd");
             next = getNodeAfterGroupEnd(currentGroup);
         }
+//System.out.println("  next: "+ next);
 
         // does this make sense????
 //        if (next == null) {
@@ -166,21 +195,36 @@ public class Runtime {
         if (parent == null) {
             return null;
         }
-        int lastIndex = parent.getNodes().indexOf(ng);
-        if (lastIndex >= parent.getNodes().size() - 1) {
-            // if this condition holds, we are at the end of the group.
+        if (parent.getType() == NodeGroup.Type.sequential) {
+            int lastIndex = parent.getNodes().indexOf(ng);
+            if (parent.getNodes().size() <= lastIndex + 1) {
+                // if this condition holds, we are at the end of the sequence.
+                return getNodeAfterGroupEnd(parent);
+            } else {
+                return parent.getNodes().get(lastIndex + 1);
+            }
+        } else {
             return getNodeAfterGroupEnd(parent);
         }
-        return parent.getNodes().get(lastIndex + 1);
     }
 
     private List<Pair<NodeGroup, DialogueNode>> getChoicesFromNode(NodeGroup parent, Node node) {
+        if (node == null) {
+            // reached a sequence end. Automatically look for another beat within the topic, or a new topic.
+            List<Pair<NodeGroup, DialogueNode>> choices = getChoicesInTopic(currentTopic.getTopic(), false);
+            if (!choices.isEmpty()) {
+                return choices;
+            }
+            return getChoicesInConversation(false);
+        }
+
         if (node instanceof DialogueNode) {
             // this is the simple case.
 
             // if we've already hit this node, discard.
-            if(deployedNodes.containsKey((DialogueNode)node))
+            if (deployedNodes.containsKey((DialogueNode) node)) {
                 return Collections.emptyList();
+            }
 
             Pair<NodeGroup, DialogueNode> pair = new Pair<NodeGroup, DialogueNode>(parent, (DialogueNode) node);
             return Collections.singletonList(pair);
