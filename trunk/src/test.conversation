@@ -13,7 +13,7 @@ starting topic welcome {
     starting beat intro {
         seq {
             node {speaker: rick, text: "Hey there"}
-            node {speaker: rick, text: "I bought you a latte, but it's a bit cold now."}
+            node {speaker: rick, text: "I bought you a latte, but it's a bit cold now." set just_bought_coffee=1 clear beat;}
 
             op {
                 beat break
@@ -40,4 +40,29 @@ starting topic welcome {
             }
         }
     }
+
+    beat coffee {
+        op {
+            seq {
+                node {when !just_bought_coffee speaker: brian, text: "so anyway,"}
+                &what_kind_of_latte // <-- initiates this node
+            }
+
+            seq what_kind_of_latte {
+                node {speaker: brian, text: "what kind of latte did you get me?"}
+                node {speaker: rick, text: "it's one of their seasonal specials. It sounded extremely noxious and sweet, I thought you would love it."}
+                op {
+                    node {speaker: brian, text: "*sip* mmm, delicious", set cheerful++;}
+                    node {speaker: brian, text: "you know me so well!", set congenial++;}
+                    op {beat break, topic break}
+                }
+            }
+
+            seq {
+                node {when just_bought_coffee speaker: brian, text: "aww, you shouldn't have!" set cheerful++;}
+                op {&what_kind_of_latte, beat break, topic break}
+            }
+        }
+    }
 }
+

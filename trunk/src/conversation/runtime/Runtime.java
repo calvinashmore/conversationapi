@@ -177,6 +177,11 @@ public class Runtime {
     private List<Pair<NodeGroup, DialogueNode>> getChoicesFromNode(NodeGroup parent, Node node) {
         if (node instanceof DialogueNode) {
             // this is the simple case.
+
+            // if we've already hit this node, discard.
+            if(deployedNodes.containsKey((DialogueNode)node))
+                return Collections.emptyList();
+
             Pair<NodeGroup, DialogueNode> pair = new Pair<NodeGroup, DialogueNode>(parent, (DialogueNode) node);
             return Collections.singletonList(pair);
         } else if (node instanceof NodeGroup) {
