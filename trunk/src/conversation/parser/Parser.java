@@ -510,6 +510,9 @@ public class Parser implements ParserConstants {
       t = jj_consume_token(IDENTIFIER);
                         r = new LogicVariable(t.image);
       break;
+    case LBRACKET:
+      r = TestCondition();
+      break;
     default:
       jj_la1[29] = jj_gen;
       jj_consume_token(-1);
@@ -526,6 +529,7 @@ public class Parser implements ParserConstants {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case IDENTIFIER:
     case LPAREN:
+    case LBRACKET:
     case BANG:
       r = Condition();
                      body.add(r);
@@ -543,7 +547,7 @@ public class Parser implements ParserConstants {
           break label_7;
         }
       }
-                                                      r = new MultiAnd(body);
+                                                      {if (true) return new MultiAnd(body);}
       break;
     case SC_OR:
       label_8:
@@ -560,11 +564,105 @@ public class Parser implements ParserConstants {
           break label_8;
         }
       }
-                                                     r = new MultiOr(body);
-     {if (true) return r;}
+                                                     {if (true) return new MultiOr(body);}
       break;
     default:
       jj_la1[32] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+    throw new Error("Missing return statement in function");
+  }
+
+  final public Condition TestCondition() throws ParseException {
+    SymbolExpression ex1, ex2;
+    TestCondition.Operation op;
+    jj_consume_token(LBRACKET);
+    ex1 = SymbolExpression();
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case EQ:
+      jj_consume_token(EQ);
+            op = TestCondition.Operation.equals;
+      break;
+    case LT:
+      jj_consume_token(LT);
+            op = TestCondition.Operation.lessThan;
+      break;
+    case LE:
+      jj_consume_token(LE);
+            op = TestCondition.Operation.lessThanOrEqualTo;
+      break;
+    case GT:
+      jj_consume_token(GT);
+            op = TestCondition.Operation.greaterThan;
+      break;
+    case GE:
+      jj_consume_token(GE);
+            op = TestCondition.Operation.greaterThanOrEqualTo;
+      break;
+    case NE:
+      jj_consume_token(NE);
+            op = TestCondition.Operation.notEqual;
+      break;
+    default:
+      jj_la1[33] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+    ex2 = SymbolExpression();
+    jj_consume_token(RBRACKET);
+     {if (true) return new TestCondition(ex1, op, ex2);}
+    throw new Error("Missing return statement in function");
+  }
+
+  final public SymbolExpression SymbolExpression() throws ParseException {
+    Token t;
+    SymbolExpression ex1, ex2;
+    SymbolOperation.Operation op;
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case IDENTIFIER:
+      t = jj_consume_token(IDENTIFIER);
+                        {if (true) return new SymbolVariable(t.image);}
+      break;
+    case INTEGER_LITERAL:
+      t = jj_consume_token(INTEGER_LITERAL);
+                             {if (true) return new SymbolConstant(Integer.valueOf(t.image));}
+      break;
+    case FLOATING_POINT_LITERAL:
+      t = jj_consume_token(FLOATING_POINT_LITERAL);
+                                    {if (true) return new SymbolConstant(Double.valueOf(t.image));}
+      break;
+    case LBRACKET:
+      jj_consume_token(LBRACKET);
+      ex1 = SymbolExpression();
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case PLUS:
+        jj_consume_token(PLUS);
+                  op = SymbolOperation.Operation.add;
+        break;
+      case MINUS:
+        jj_consume_token(MINUS);
+                   op = SymbolOperation.Operation.subtract;
+        break;
+      case STAR:
+        jj_consume_token(STAR);
+                  op = SymbolOperation.Operation.multiply;
+        break;
+      case SLASH:
+        jj_consume_token(SLASH);
+                   op = SymbolOperation.Operation.divide;
+        break;
+      default:
+        jj_la1[34] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+      ex2 = SymbolExpression();
+      jj_consume_token(RBRACKET);
+         {if (true) return new SymbolOperation(ex1, op, ex2);}
+      break;
+    default:
+      jj_la1[35] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -576,7 +674,7 @@ public class Parser implements ParserConstants {
   public Token token, jj_nt;
   private int jj_ntk;
   private int jj_gen;
-  final private int[] jj_la1 = new int[33];
+  final private int[] jj_la1 = new int[36];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static private int[] jj_la1_2;
@@ -586,13 +684,13 @@ public class Parser implements ParserConstants {
       jj_la1_2();
    }
    private static void jj_la1_0() {
-      jj_la1_0 = new int[] {0x400000,0x1800000,0x0,0x800000,0x0,0x80000000,0x2800000,0x800000,0x0,0x80000000,0x0,0x0,0x18000000,0x0,0x0,0x0,0x0,0x5f000000,0x5f000000,0x0,0x80000000,0x0,0x0,0x3000000,0x0,0x0,0x122000,0x0,0x0,0x0,0x0,0x0,0x0,};
+      jj_la1_0 = new int[] {0x400000,0x1800000,0x0,0x800000,0x0,0x80000000,0x2800000,0x800000,0x0,0x80000000,0x0,0x0,0x18000000,0x0,0x0,0x0,0x0,0x5f000000,0x5f000000,0x0,0x80000000,0x0,0x0,0x3000000,0x0,0x0,0x122000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x22000,};
    }
    private static void jj_la1_1() {
-      jj_la1_1 = new int[] {0x0,0x0,0x80,0x0,0x4,0x0,0x0,0x0,0x4,0x0,0x4,0x4,0x0,0x1000,0x1000,0x1000,0x1000,0x0,0x0,0x4,0x0,0x1,0x4,0x0,0x2,0x18008000,0x4,0x4,0x1000,0x20024,0x4000000,0x2000000,0x2020024,};
+      jj_la1_1 = new int[] {0x0,0x0,0x80,0x0,0x4,0x0,0x0,0x0,0x4,0x0,0x4,0x4,0x0,0x1000,0x1000,0x1000,0x1000,0x0,0x0,0x4,0x0,0x1,0x4,0x0,0x2,0x18008000,0x4,0x4,0x1000,0x20224,0x4000000,0x2000000,0x2020224,0x1e10000,0xe0000000,0x204,};
    }
    private static void jj_la1_2() {
-      jj_la1_2 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x2,0x2,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
+      jj_la1_2 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x2,0x2,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x100000,0x1,0x0,};
    }
 
   public Parser(java.io.InputStream stream) {
@@ -604,7 +702,7 @@ public class Parser implements ParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 33; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 36; i++) jj_la1[i] = -1;
   }
 
   public void ReInit(java.io.InputStream stream) {
@@ -616,7 +714,7 @@ public class Parser implements ParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 33; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 36; i++) jj_la1[i] = -1;
   }
 
   public Parser(java.io.Reader stream) {
@@ -625,7 +723,7 @@ public class Parser implements ParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 33; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 36; i++) jj_la1[i] = -1;
   }
 
   public void ReInit(java.io.Reader stream) {
@@ -634,7 +732,7 @@ public class Parser implements ParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 33; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 36; i++) jj_la1[i] = -1;
   }
 
   public Parser(ParserTokenManager tm) {
@@ -642,7 +740,7 @@ public class Parser implements ParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 33; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 36; i++) jj_la1[i] = -1;
   }
 
   public void ReInit(ParserTokenManager tm) {
@@ -650,7 +748,7 @@ public class Parser implements ParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 33; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 36; i++) jj_la1[i] = -1;
   }
 
   final private Token jj_consume_token(int kind) throws ParseException {
@@ -705,7 +803,7 @@ public class Parser implements ParserConstants {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 33; i++) {
+    for (int i = 0; i < 36; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
