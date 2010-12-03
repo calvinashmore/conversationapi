@@ -450,7 +450,7 @@ Condition Condition()  : {
     ( <LPAREN> r = Condition1() <RPAREN>
     | <BANG> r = Condition() {r = new Not(r);}
     | t = <IDENTIFIER> {r = new LogicVariable(t.image);}
-//    | r = TestCondition()
+    | r = TestCondition()
     )
     {return r;}
 }
@@ -462,23 +462,46 @@ Condition Condition1()  : {
 } {
     r = Condition() {body.add(r);}
 
-        ( (<SC_AND> r = Condition() {body.add(r);})+ {r = new MultiAnd(body);} )
-    |   ( (<SC_OR> r = Condition() {body.add(r);})+ {r = new MultiOr(body);} )
-
-    {return r;}
+        ( (<SC_AND> r = Condition() {body.add(r);})+ {return new MultiAnd(body);} )
+    |   ( (<SC_OR> r = Condition() {body.add(r);})+ {return new MultiOr(body);} )
 }
-
-/*
-In terms of getting test conditions to work: probably want to refactor stuff in
-conversation.core.conditions to have a Test class, which has inside of it each of the
-test types (>, >=, <, <=, ==, etc), removing the individual classes.
-Secondly, also have a SymbolOperation class? with Arithmetic things (+,-,/,*, etc)
 
 Condition TestCondition() : {
     SymbolExpression ex1, ex2;
-
+    TestCondition.Operation op;
 } {
+    <LBRACKET>
     ex1 = SymbolExpression()
-    (<>)
+    ( <EQ> {op = TestCondition.Operation.equals;}
+    | <LT> {op = TestCondition.Operation.lessThan;}
+    | <LE> {op = TestCondition.Operation.lessThanOrEqualTo;}
+    | <GT> {op = TestCondition.Operation.greaterThan;}
+    | <GE> {op = TestCondition.Operation.greaterThanOrEqualTo;}
+    | <NE> {op = TestCondition.Operation.notEqual;}
+    )
+    ex2 = SymbolExpression()
+    <RBRACKET>
+    {return new TestCondition(ex1, op, ex2);}
 }
-*/
+
+SymbolExpression SymbolExpression() : {
+    Token t;
+    SymbolExpression ex1, ex2;
+    SymbolOperation.Operation op;
+} {
+      t = <IDENTIFIER> {return new SymbolVariable(t.image);}
+    | t = <INTEGER_LITERAL> {return new SymbolConstant(Integer.valueOf(t.image));}
+    | t = <FLOATING_POINT_LITERAL> {return new SymbolConstant(Double.valueOf(t.image));}
+    | (
+        <LBRACKET>
+        ex1 = SymbolExpression()
+        ( <PLUS> {op = SymbolOperation.Operation.add;}
+        | <MINUS> {op = SymbolOperation.Operation.subtract;}
+        | <STAR> {op = SymbolOperation.Operation.multiply;}
+        | <SLASH> {op = SymbolOperation.Operation.divide;}
+        )
+        ex2 = SymbolExpression()
+        <RBRACKET>
+        {return new SymbolOperation(ex1, op, ex2);}
+    )
+}

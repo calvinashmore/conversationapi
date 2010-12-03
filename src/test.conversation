@@ -1,3 +1,33 @@
+
+/*
+
+Thoughts on backstory:
+
+Rick and Brian are meeting at a coffee shop as an informal hangout meeting.
+The two of them have been friends for a long time, dating back to high school.
+They've been through a lot together, and have remained friends, but their
+friendship has occasionally been strained.
+
+Rick is gay, Brian is straight. Brian has been in and out of relationships in
+the past few months, and is attempting to balance a desire for sensation and
+release with a deeper sense that he's missing something. Also is concerned that
+he is getting older (both are in late 20s) and he should be finding some
+direction in his life. Brian has been working random jobs and rarely holding
+anything down.
+
+Rick has been more stable, but is struggling with his own anxieties and desires.
+Rick has the opposite problem, where he feels like his life is too stable, and
+he is interested in more adventure. Rick is in a relationship with another
+character, Sam, who is himself frustrated with Rick's stability and has been
+having flings with other guys. Rick knows this, but is pretending that it hasn't
+been happening.
+
+Rick is waiting at the coffee shop, Brian is late again, as usual.
+
+player agent should be Brian, I think.......
+Gives a choice as to whether to be apologetic or what.
+*/
+
 conversation CoffeeShop;
 
 participant rick {
@@ -53,7 +83,7 @@ starting topic welcome {
                 node {speaker: rick, text: "it's one of their seasonal specials. It sounded extremely noxious and sweet, I thought you would love it."}
                 op {
                     node {speaker: brian, text: "*sip* mmm, delicious", set cheerful++;}
-                    node {speaker: brian, text: "you know me so well!", set congenial++;}
+                    node {speaker: brian, text: "you know me so well!", set congenial++; cheerful++;}
                     op {beat break, topic break}
                 }
             }
@@ -66,30 +96,67 @@ starting topic welcome {
     }
 }
 
-topic miscellaneous_smalltalk {
+topic misc_smalltalk_howareyou {
+    // rick asks brian how he is
     starting beat {
         seq {
             node {speaker: rick, text:"so... how are you?"}
             op{
                 node {speaker: brian, text:"not too bad"} // generic non-answer
-                node {speaker: brian, text:"pretty good, actually", set cheerful++; positivity++;}
+                node {when [sullen==0] speaker: brian, text:"pretty good, actually", set cheerful++; positivity++;}
                 node {speaker: brian, text:"eenh, things are okay", set cheerful--;}
                 node {speaker: brian, text:"not great", set positivity--; cheerful--; sullen++;}
             }
-        }
-    }
-    starting beat {
-        seq {
-            node {speaker: rick, text:"been up to anything exciting?"}
+            op {
+                node {when [cheerful>=1] speaker: rick, text: "nice and chipper, then?"}
+            }
         }
     }
 
     beat {
-        //mood response 1
         // rick speaks, reacting to brian’s mood
-        when sullen
-        op {
-            node {speaker: rick, text:"What’s wrong?"}
+        when (sullen && !cyndi_breakup)
+        seq {
+            node {speaker: rick, text:"what’s wrong?"}
+            op {
+                seq {
+                    // in this segment, Brian continues to be evasive, ending the topic.
+                    node {speaker: brian, text:"oh, nothing, really..." set evasive++;}
+                    topic break
+                }
+                node {speaker: brian, text:"it's been kind of a rough week."}
+            }
+            node {speaker: rick, text:"okaaaay, go on?"}
+            op {
+                node {speaker: brian, text:"well... Cyndi and I broke up." set cyndi_breakup++;}
+                node {speaker: brian, text:"you know, the usual. silly relationship drama. *smile*" set brian_promiscuity++;}
+            }
+        }
+    }
+
+    beat {
+        when [positivity < 0]
+        seq {
+            node {speaker: rick, text: "you look like you could use some cheering up."}
+        }
+    }
+}
+
+topic cyndi_breakup_exposition {
+    when cyndi_breakup
+
+    beat {
+        seq {
+            node {speaker: rick, text: "How long had you guys been dating?"}
+        }
+    }
+}
+
+topic misc_smalltalk_whatsup {
+
+    starting beat {
+        seq {
+            node {speaker: rick, text:"been up to anything exciting?"}
         }
     }
 }
