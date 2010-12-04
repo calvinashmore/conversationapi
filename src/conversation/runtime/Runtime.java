@@ -113,7 +113,7 @@ public class Runtime {
      * @return
      */
     public boolean step(RuntimeSelector selector) {
-        List<Pair<NodeGroup, DialogueNode>> currentNodeChoices = getCurrentNodeChoices();
+        List<Pair<NodeGroup, DialogueNode>> currentNodeChoices = getCurrentNodeChoices(currentGroup, lastNode.getNode());
         if (currentNodeChoices == null || currentNodeChoices.isEmpty()) {
             return false;
         }
@@ -142,47 +142,50 @@ public class Runtime {
      * Otherwise there will need to be a choice.
      * @return
      */
-    private List<Pair<NodeGroup, DialogueNode>> getCurrentNodeChoices() {
+    private List<Pair<NodeGroup, DialogueNode>> getCurrentNodeChoices(NodeGroup group, Node lastNode) {
 
-        // we may be able to return quickly. 
-        // if we were on a sequential node group, attempt to go to the next
         Node next;
-//System.out.println("getCurrentNodeChoices");
-        if (currentGroup.getType() == NodeGroup.Type.sequential) {
+        if (group.getType() == NodeGroup.Type.sequential) {
+            // if we were on a sequential node group, attempt to go to the next
             // get the placement of the last node.
-            int lastIndex = currentGroup.getNodes().indexOf(lastNode.getNode());
+            int lastIndex = group.getNodes().indexOf(lastNode);
 
-            if (currentGroup.getNodes().size() <= lastIndex + 1) {
-                // need to go up a level
-//System.out.println("  end and sequential: getNodeAfterGroupEnd");
-                next = getNodeAfterGroupEnd(currentGroup);
-            } else {
-                // need to choose the next one
-                // ********** IMPORTANT: this may not be enabled given conditions. What to do otherwise?
-//System.out.println("  next sequential");
-                next = currentGroup.getNodes().get(lastIndex + 1);
+            // iterate through the members of the sequence and return if we find something that fits.
+            // usually the next element in the sequence will be fine, but sometimes there are conditions, and if a
+            // node in a sequence has an unmet condition, then we pass it and continue.
+            for (int index = lastIndex + 1; index < group.getNodes().size(); index++) {
+
+                next = group.getNodes().get(index);
+                List<Pair<NodeGroup, DialogueNode>> choices = getChoicesFromNode(group, next);
+                if (choices != null && !choices.isEmpty()) {
+                    return choices;
+                }
             }
-        } else {
-            // need to go up a level
-//System.out.println("  end and optional: getNodeAfterGroupEnd");
-            next = getNodeAfterGroupEnd(currentGroup);
         }
-//System.out.println("  next: "+ next);
 
-        // does this make sense????
-//        if (next == null) {
-//            List<Pair<NodeGroup, DialogueNode>> choices = getChoicesInTopic(currentTopic.getTopic(), false);
-//            if (choices.isEmpty()) {
-//                return getChoicesInConversation(false);
-//            }
-//        }
+        // OTHERWISE, either if we are in an optional group (as opposed to a sequential one)
+        // or if we are at the end of the sequence, look for the node after the group end.
+        // Go up until we hit a valid group.
+        List<Pair<NodeGroup, DialogueNode>> choices;
+        next = getNodeAfterGroupEnd(group);
+        choices = getChoicesFromNode(group, next);
 
-        // we have a node, there are several things it can be:
-        // either a dialouge node, a group, or a break.
-        return getChoicesFromNode(currentGroup, next);
+        // end case-- there are no more options.
+        // next is null, meaning that we are at the end of a beat, and choices are empty,
+        // meaning that there are no possible choices left.
+        // this ends the conversation.
+        if (next == null && (choices == null || choices.isEmpty())) {
+            return null;
+        }
 
-        // look in the current group, manipulate.
-        // if we are in a block which provides a topic or beat break, search those too.
+        // return choices if they exist.
+        if (!choices.isEmpty()) {
+            return choices;
+        }
+
+        // go up again.
+        return getCurrentNodeChoices(group.getParent(), next);
+
     }
 
     /**
@@ -221,12 +224,18 @@ public class Runtime {
         if (node instanceof DialogueNode) {
             // this is the simple case.
 
+            DialogueNode dialogueNode = (DialogueNode) node;
+
             // if we've already hit this node, discard.
-            if (deployedNodes.containsKey((DialogueNode) node)) {
+            if (deployedNodes.containsKey(dialogueNode)) {
                 return Collections.emptyList();
             }
 
-            Pair<NodeGroup, DialogueNode> pair = new Pair<NodeGroup, DialogueNode>(parent, (DialogueNode) node);
+            if (!dialogueNode.getCondition().evaluate(currentState)) {
+                return Collections.emptyList();
+            }
+
+            Pair<NodeGroup, DialogueNode> pair = new Pair<NodeGroup, DialogueNode>(parent, dialogueNode);
             return Collections.singletonList(pair);
         } else if (node instanceof NodeGroup) {
             // entering a NEW NodeGroup, so start from the top.
