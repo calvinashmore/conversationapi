@@ -8,20 +8,27 @@ import conversation.core.Conversation;
 import conversation.core.DialogueBeat;
 import conversation.core.DialogueNode;
 import conversation.core.Topic;
+import conversation.parser.ParseException;
 import conversation.parser.Parser;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JTextArea;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -32,18 +39,29 @@ import javax.swing.event.ListSelectionListener;
  */
 public class MainPanel extends JPanel {
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String args[]) {
         JFrame frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        MainPanel panel = new MainPanel();
+        final MainPanel panel = new MainPanel();
         frame.add(panel);
         frame.pack();
         frame.setVisible(true);
 
+        JMenuBar menu = new JMenuBar();
+        JMenuItem openCommand = new JMenuItem("Open");
+        openCommand.addActionListener(new ActionListener() {
 
-        Parser parser = new Parser(new FileInputStream("src/test.conversation"));
-        Conversation conversation = parser.ConversationTopLevel();
-        panel.runConversation(conversation);
+            public void actionPerformed(ActionEvent e) {
+                handleOpen(panel);
+            }
+        });
+        menu.add(openCommand);
+        frame.setJMenuBar(menu);
+
+
+//        Parser parser = new Parser(new FileInputStream("src/test.conversation"));
+//        Conversation conversation = parser.ConversationTopLevel();
+//        panel.runConversation(conversation);
     }
     private JTextArea output;
     private JList selections;
@@ -52,6 +70,38 @@ public class MainPanel extends JPanel {
     final private Selector selector;
     private DialogueNode selection;
     private conversation.runtime.Runtime runtime;
+
+    private static void handleOpen(MainPanel parent) {
+
+        if (parent.runtime != null) {
+            // do not continue if we are already running.
+            return;
+        }
+
+        JFileChooser fc = new JFileChooser();
+        String curDir = System.getProperty("user.dir");
+        fc.setCurrentDirectory(new File(curDir));
+        fc.showOpenDialog(parent);
+
+        File selectedFile = fc.getSelectedFile();
+        if (selectedFile == null) {
+            return;
+        }
+
+        try {
+            Parser parser = new Parser(new FileInputStream(selectedFile));
+            Conversation conversation = parser.ConversationTopLevel();
+
+            parent.runConversation(conversation);
+
+        } catch (FileNotFoundException ex) {
+            parent.output.append("Could not find file\n");
+        } catch (ParseException ex) {
+            parent.output.append("Error parsing file\n");
+            parent.output.append("message: " + ex.getMessage() + "\n");
+            ex.printStackTrace();
+        }
+    }
 
     public MainPanel() {
 
@@ -132,10 +182,18 @@ public class MainPanel extends JPanel {
         output.append("Starting new conversation: " + c.getLabel() + "\n");
         runtime.setListener(new ConversationLogger());
         runtime.startConversation();
-        while (runtime.step(selector)) {
-        }
-        output.append("Conversation end");
-        selections.setModel(new DefaultComboBoxModel());
+        Runnable r = new Runnable() {
+
+            public void run() {
+                while (runtime.step(selector)) {
+                }
+                output.append("Conversation end");
+                selections.setModel(new DefaultComboBoxModel());
+                runtime = null;
+            }
+        };
+
+        new Thread(r).start();
     }
 
     private void selectionChanged() {
