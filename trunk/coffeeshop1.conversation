@@ -148,6 +148,49 @@ topic cyndi_breakup_exposition {
     beat {
         seq {
             node {speaker: rick, text: "How long had you guys been dating?"}
+            node {speaker: brian, text: "About two months"}
+            node {speaker: rick, text: "That's... not very long, now, is it?"}
+        }
+    }
+
+    beat {
+        seq {
+            node {speaker: rick, text: "Why did you break up, anyway?"}
+            op {
+                node {speaker: brian, text: "I don't think I was really emotionally invested." set emotional=1 clear beat;} // slightly intelligent response?
+                node {speaker: brian, text: "She had man hands." set manhands=1 clear beat;} // goofball response
+                node {speaker: brian, text: "You know... I'm not really sure."} // this would come before the timeout, but not long before it.
+                node {speaker: brian, text: "..."} // sullen response - or timeout?
+            }
+            op {
+                // these handle some of the responses from the above question.
+                // the organization here is a little messy. Should we do something about this?
+                node {speaker: rick, text: "Huh."} // this might be called if Rick wants to talk about something else???
+                seq {
+                    node {when manhands speaker: rick, text: "*raises eyebrow* That's an awfully shallow reason to break up."}
+                    node {speaker: brian, text: "You only say that because you're gay."}
+                    // this can lead to a silly conversational direction or a somewhat serious one.
+                    //
+                }
+                seq {
+                    node {when emotional speaker: rick, text: "Okay, why do you say that?"}
+                    op {
+                        node {speaker: brian, text: "Well... I don't know, really."}
+                        node {speaker: brian, text: "I thought there should be something more, I guess."}
+                    }
+                    // these can follow up into new beats?
+                    // maybe a beat for what one might want out of a relationship?
+                }
+            }
+        }
+    }
+
+    beat {
+        // when insight up to some level?
+        seq {
+            node {speaker: rick, text: "Look. You can't just try to restart a relationship every time something goes less than perfectly."}
+            node {speaker: rick, text: "You have a history, a past, you have to learn from it."}
+            node {speaker: rick, text: "But... you also have to work with your present, there's never going to be a blank slate."}
         }
     }
 }
